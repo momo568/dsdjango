@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "category": "Django Basics",
+    "difficulty": "easy",
+    "question": "What is Django?",
+    "expected_answer": "Django is a high-level Python web framework that encourages rapid development and clean, pragmatic design."
+  },
+  {
+    "id": 2,
+    "category": "Django ORM",
+    "difficulty": "medium",
+    "question": "How does Django ORM work?",
+    "expected_answer": "Django ORM maps Python models to database tables and allows writing database queries using Python instead of SQL."
+  },
+  {
+    "id": 3,
+    "category": "Django Security",
+    "difficulty": "medium",
+    "question": "How to secure a Django REST API?",
+    "expected_answer": "Secure a Django REST API using JWT authentication, RBAC permissions, throttling, HTTPS, and input validation."
+  },
+  {
+    "id": 4,
+    "category": "Django Async",
+    "difficulty": "hard",
+    "question": "What is ASGI in Django?",
+    "expected_answer": "ASGI is Django's asynchronous server interface that handles WebSocket connections and async HTTP requests."
+  },
+  {
+    "id": 5,
+    "category": "Django Middleware",
+    "difficulty": "medium",
+    "question": "What is Django middleware?",
+    "expected_answer": "Django middleware is a hook system that processes requests and responses globally before they reach the view."
+  },
+  {
+    "id": 6,
+    "category": "Django Cache",
+    "difficulty": "medium",
+    "question": "How does Django caching work?",
+    "expected_answer": "Django supports Redis and Memcached backends to cache frequently accessed data and reduce database queries."
+  },
+  {
+    "id": 7,
+    "category": "Django Testing",
+    "difficulty": "medium",
+    "question": "How to test a Django application?",
+    "expected_answer": "Django provides a test framework based on unittest with TestCase class and Client to simulate HTTP requests."
+  },
+  {
+    "id": 8,
+    "category": "Django Deployment",
+    "difficulty": "hard",
+    "question": "How to deploy Django in production?",
+    "expected_answer": "Deploy Django with Gunicorn or Uvicorn as WSGI/ASGI server, Nginx as reverse proxy, and PostgreSQL as database."
+  },
+  {
+    "id": 9,
+    "category": "Django REST",
+    "difficulty": "medium",
+    "question": "How to create a REST API with Django?",
+    "expected_answer": "Create a REST API using Django REST Framework with serializers, viewsets, routers and permissions."
+  },
+  {
+    "id": 10,
+    "category": "Django Admin",
+    "difficulty": "easy",
+    "question": "What is Django admin panel?",
+    "expected_answer": "Django admin is an auto-generated web interface to manage models with filtering, actions and custom fields."
+  }
+]

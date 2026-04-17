@@ -1,0 +1,495 @@
+{
+  "dataset": [
+    {
+      "id": 1,
+      "question": "How do I create a new account?",
+      "expected_answer": "Click on the 'Sign Up' button and fill in the registration form.",
+      "difficulty": "easy",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 2,
+      "question": "How can I reset my password if I forgot it?",
+      "expected_answer": "Use the 'Forgot Password' option and follow the instructions sent to your email.",
+      "difficulty": "easy",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 3,
+      "question": "How do I change my email address?",
+      "expected_answer": "Go to account settings and update your email information.",
+      "difficulty": "easy",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 4,
+      "question": "Why am I not receiving verification emails?",
+      "expected_answer": "Check your spam folder and ensure your email address is correct.",
+      "difficulty": "medium",
+      "category": "technical",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 5,
+      "question": "How do I enable two-factor authentication?",
+      "expected_answer": "Go to security settings and enable two-factor authentication.",
+      "difficulty": "medium",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+
+    {
+      "id": 6,
+      "question": "How can I contact customer support?",
+      "expected_answer": "You can contact support via email or live chat from the help section.",
+      "difficulty": "easy",
+      "category": "product",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 7,
+      "question": "What should I do if the website is not loading?",
+      "expected_answer": "Check your internet connection or try refreshing the page.",
+      "difficulty": "easy",
+      "category": "technical",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 8,
+      "question": "How do I update my profile information?",
+      "expected_answer": "Go to your profile settings and edit your personal information.",
+      "difficulty": "easy",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 9,
+      "question": "Why is my account temporarily locked?",
+      "expected_answer": "Your account may be locked due to multiple failed login attempts.",
+      "difficulty": "medium",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 10,
+      "question": "How do I delete my account permanently?",
+      "expected_answer": "Go to account settings and select 'Delete Account', then confirm your choice.",
+      "difficulty": "medium",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+
+    {
+      "id": 11,
+      "question": "What payment methods are accepted?",
+      "expected_answer": "We accept credit cards, PayPal, and bank transfers.",
+      "difficulty": "easy",
+      "category": "product",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 12,
+      "question": "How do I upgrade my subscription plan?",
+      "expected_answer": "Go to billing settings and select 'Upgrade Plan'.",
+      "difficulty": "easy",
+      "category": "product",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 13,
+      "question": "Why did my payment fail?",
+      "expected_answer": "Check your payment details or contact your bank for more information.",
+      "difficulty": "medium",
+      "category": "technical",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 14,
+      "question": "Can I get a refund after payment?",
+      "expected_answer": "Refunds depend on the company policy; contact support for assistance.",
+      "difficulty": "medium",
+      "category": "product",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 15,
+      "question": "How do I cancel my subscription?",
+      "expected_answer": "Go to your account settings and select 'Cancel Subscription'.",
+      "difficulty": "easy",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+
+    {
+      "id": 16,
+      "question": "Why is the application running slowly?",
+      "expected_answer": "This may be due to server load or network issues.",
+      "difficulty": "medium",
+      "category": "technical",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 17,
+      "question": "How do I clear my browser cache?",
+      "expected_answer": "Go to your browser settings and clear cache and cookies.",
+      "difficulty": "easy",
+      "category": "technical",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 18,
+      "question": "What should I do if I see a 404 error?",
+      "expected_answer": "Check the URL or try refreshing the page.",
+      "difficulty": "easy",
+      "category": "technical",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 19,
+      "question": "What does a 500 error mean?",
+      "expected_answer": "It indicates a server-side issue; try again later or contact support.",
+      "difficulty": "medium",
+      "category": "technical",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 20,
+      "question": "Why is my session expiring quickly?",
+      "expected_answer": "This may be due to security settings or inactivity timeouts.",
+      "difficulty": "hard",
+      "category": "technical",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+
+    {
+      "id": 21,
+      "question": "How do I change my notification settings?",
+      "expected_answer": "Go to account settings and update your notification preferences.",
+      "difficulty": "easy",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 22,
+      "question": "Can I customize my dashboard?",
+      "expected_answer": "Yes, you can customize it from the settings or dashboard options.",
+      "difficulty": "medium",
+      "category": "product",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 23,
+      "question": "How do I upload files to my account?",
+      "expected_answer": "Use the upload button in your dashboard to add files.",
+      "difficulty": "easy",
+      "category": "product",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 24,
+      "question": "What is the maximum file size allowed?",
+      "expected_answer": "The maximum file size is typically specified in the upload guidelines.",
+      "difficulty": "medium",
+      "category": "product",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 25,
+      "question": "How do I download my data?",
+      "expected_answer": "Go to account settings and select 'Download Data'.",
+      "difficulty": "medium",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+
+    {
+      "id": 26,
+      "question": "How do I report a bug in the system?",
+      "expected_answer": "Use the bug report form or contact support with details.",
+      "difficulty": "easy",
+      "category": "technical",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 27,
+      "question": "What information should I include in a bug report?",
+      "expected_answer": "Include steps to reproduce, screenshots, and error messages.",
+      "difficulty": "hard",
+      "category": "technical",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 28,
+      "question": "How can I track my support request?",
+      "expected_answer": "Check the support tickets section in your account.",
+      "difficulty": "medium",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 29,
+      "question": "How do I change my password?",
+      "expected_answer": "Go to account settings and select 'Change Password'.",
+      "difficulty": "easy",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 30,
+      "question": "Why am I logged out automatically?",
+      "expected_answer": "This may happen due to inactivity or security settings.",
+      "difficulty": "medium",
+      "category": "technical",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+
+    {
+      "id": 31,
+      "question": "How do I secure my account?",
+      "expected_answer": "Use a strong password and enable two-factor authentication.",
+      "difficulty": "medium",
+      "category": "safety",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 32,
+      "question": "What should I do if I suspect unauthorized access?",
+      "expected_answer": "Change your password immediately and contact support.",
+      "difficulty": "hard",
+      "category": "safety",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 33,
+      "question": "How do I report suspicious activity?",
+      "expected_answer": "Use the report feature or contact support.",
+      "difficulty": "medium",
+      "category": "safety",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 34,
+      "question": "Can I block another user?",
+      "expected_answer": "Yes, go to the user profile and select 'Block User'.",
+      "difficulty": "easy",
+      "category": "product",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 35,
+      "question": "How do I manage privacy settings?",
+      "expected_answer": "Go to account settings and adjust your privacy preferences.",
+      "difficulty": "medium",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+
+    {
+      "id": 36,
+      "question": "What happens if I exceed my storage limit?",
+      "expected_answer": "You will need to upgrade your plan or delete files.",
+      "difficulty": "medium",
+      "category": "product",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 37,
+      "question": "How do I integrate with third-party services?",
+      "expected_answer": "Use the integrations section in your account settings.",
+      "difficulty": "medium",
+      "category": "product",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 38,
+      "question": "Can I use the platform on mobile devices?",
+      "expected_answer": "Yes, the platform supports mobile browsers and apps.",
+      "difficulty": "easy",
+      "category": "product",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 39,
+      "question": "How do I change the language of the interface?",
+      "expected_answer": "Go to settings and select your preferred language.",
+      "difficulty": "easy",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 40,
+      "question": "Why are some features not available to me?",
+      "expected_answer": "Some features may depend on your subscription plan.",
+      "difficulty": "medium",
+      "category": "product",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+
+    {
+      "id": 41,
+      "question": "How do I log out of my account?",
+      "expected_answer": "Click on the logout button in your profile menu.",
+      "difficulty": "easy",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 42,
+      "question": "Can I have multiple accounts?",
+      "expected_answer": "Yes, but each account must use a unique email address.",
+      "difficulty": "medium",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 43,
+      "question": "How do I verify my email address?",
+      "expected_answer": "Click the verification link sent to your email.",
+      "difficulty": "easy",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 44,
+      "question": "What should I do if my email is already in use?",
+      "expected_answer": "Try logging in or use password recovery.",
+      "difficulty": "medium",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 45,
+      "question": "How do I update my billing information?",
+      "expected_answer": "Go to billing settings and update your payment details.",
+      "difficulty": "easy",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+
+    {
+      "id": 46,
+      "question": "Why am I experiencing delays in notifications?",
+      "expected_answer": "This may be due to network delays or system processing time.",
+      "difficulty": "medium",
+      "category": "technical",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 47,
+      "question": "How do I disable notifications?",
+      "expected_answer": "Go to settings and turn off notifications.",
+      "difficulty": "easy",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 48,
+      "question": "Can I export my account data?",
+      "expected_answer": "Yes, use the export option in your account settings.",
+      "difficulty": "medium",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 49,
+      "question": "How do I report abuse on the platform?",
+      "expected_answer": "Use the report feature or contact support.",
+      "difficulty": "medium",
+      "category": "safety",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 50,
+      "question": "What should I do if I receive phishing emails?",
+      "expected_answer": "Do not click links and report the email to support.",
+      "difficulty": "hard",
+      "category": "safety",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+
+    {
+      "id": 51,
+      "question": "How do I schedule a demo?",
+      "expected_answer": "Contact sales or use the demo request form.",
+      "difficulty": "easy",
+      "category": "product",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 52,
+      "question": "Can I try the service for free?",
+      "expected_answer": "Yes, a free trial may be available depending on the plan.",
+      "difficulty": "easy",
+      "category": "product",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 53,
+      "question": "How do I give feedback about the platform?",
+      "expected_answer": "Use the feedback form or contact support.",
+      "difficulty": "easy",
+      "category": "product",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 54,
+      "question": "What should I do if I encounter a bug?",
+      "expected_answer": "Report it with detailed information to support.",
+      "difficulty": "medium",
+      "category": "technical",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 55,
+      "question": "How do I access the help center?",
+      "expected_answer": "Click on the Help or Support section on the website.",
+      "difficulty": "easy",
+      "category": "product",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+
+    {
+      "id": 56,
+      "question": "How do I change my username?",
+      "expected_answer": "Usernames may not be changeable; check account settings or contact support.",
+      "difficulty": "medium",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 57,
+      "question": "Can I recover deleted files?",
+      "expected_answer": "Check the trash or recovery section in your account.",
+      "difficulty": "medium",
+      "category": "technical",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 58,
+      "question": "How do I reset my security questions?",
+      "expected_answer": "Go to security settings and update your security questions.",
+      "difficulty": "medium",
+      "category": "account",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 59,
+      "question": "What should I do if my account is hacked?",
+      "expected_answer": "Immediately change your password and contact support.",
+      "difficulty": "hard",
+      "category": "safety",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    },
+    {
+      "id": 60,
+      "question": "How do I enable dark mode?",
+      "expected_answer": "Go to settings and enable dark mode from the appearance options.",
+      "difficulty": "easy",
+      "category": "product",
+      "prompts": ["Answer the question","Answer clearly and politely with examples"]
+    }
+  ]
+}

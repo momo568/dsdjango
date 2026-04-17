@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "category": "Python Basics",
+    "difficulty": "easy",
+    "question": "C'est quoi Python ?",
+    "expected_answer": "Python est un langage de programmation interprété, orienté objet, de haut niveau avec une syntaxe claire et lisible."
+  },
+  {
+    "id": 2,
+    "category": "Python OOP",
+    "difficulty": "medium",
+    "question": "C'est quoi une classe en Python ?",
+    "expected_answer": "Une classe en Python est un modèle qui définit les attributs et méthodes d'un objet, permettant la programmation orientée objet."
+  },
+  {
+    "id": 3,
+    "category": "Python Functions",
+    "difficulty": "easy",
+    "question": "C'est quoi une fonction lambda en Python ?",
+    "expected_answer": "Une fonction lambda est une fonction anonyme définie en une seule ligne avec le mot-clé lambda, utilisée pour des opérations simples."
+  },
+  {
+    "id": 4,
+    "category": "Python Advanced",
+    "difficulty": "hard",
+    "question": "C'est quoi un décorateur en Python ?",
+    "expected_answer": "Un décorateur est une fonction qui modifie le comportement d'une autre fonction sans changer son code source, utilisant la syntaxe @decorator."
+  },
+  {
+    "id": 5,
+    "category": "Python Data",
+    "difficulty": "medium",
+    "question": "C'est quoi une liste par compréhension en Python ?",
+    "expected_answer": "Une liste par compréhension est une syntaxe concise pour créer des listes à partir d'itérables avec une seule ligne de code."
+  },
+  {
+    "id": 6,
+    "category": "Python Async",
+    "difficulty": "hard",
+    "question": "C'est quoi async/await en Python ?",
+    "expected_answer": "async/await est une syntaxe Python pour la programmation asynchrone permettant d'exécuter des tâches concurrentes sans bloquer le thread principal."
+  },
+  {
+    "id": 7,
+    "category": "Python Error",
+    "difficulty": "easy",
+    "question": "Comment gérer les exceptions en Python ?",
+    "expected_answer": "Les exceptions en Python sont gérées avec try/except/finally pour capturer et traiter les erreurs sans arrêter le programme."
+  },
+  {
+    "id": 8,
+    "category": "Python Files",
+    "difficulty": "easy",
+    "question": "Comment lire un fichier en Python ?",
+    "expected_answer": "En Python, on lit un fichier avec open() et with statement pour garantir la fermeture automatique du fichier après lecture."
+  },
+  {
+    "id": 9,
+    "category": "Python Modules",
+    "difficulty": "medium",
+    "question": "C'est quoi pip en Python ?",
+    "expected_answer": "pip est le gestionnaire de packages Python qui permet d'installer, mettre à jour et désinstaller des bibliothèques tierces facilement."
+  },
+  {
+    "id": 10,
+    "category": "Python Testing",
+    "difficulty": "medium",
+    "question": "Comment tester du code Python ?",
+    "expected_answer": "On teste du code Python avec unittest ou pytest pour écrire des tests unitaires qui vérifient le comportement des fonctions et classes."
+  }
+]

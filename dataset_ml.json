@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "category": "ML Basics",
+    "difficulty": "easy",
+    "question": "C'est quoi le machine learning ?",
+    "expected_answer": "Le machine learning est une branche de l'IA qui permet aux machines d'apprendre automatiquement à partir de données sans être explicitement programmées."
+  },
+  {
+    "id": 2,
+    "category": "ML Supervised",
+    "difficulty": "medium",
+    "question": "C'est quoi l'apprentissage supervisé ?",
+    "expected_answer": "L'apprentissage supervisé est une méthode où le modèle apprend à partir de données étiquetées pour faire des prédictions sur de nouvelles données."
+  },
+  {
+    "id": 3,
+    "category": "ML Models",
+    "difficulty": "medium",
+    "question": "C'est quoi une forêt aléatoire ?",
+    "expected_answer": "Une forêt aléatoire est un ensemble d'arbres de décision qui combinent leurs prédictions pour améliorer la précision et réduire le surapprentissage."
+  },
+  {
+    "id": 4,
+    "category": "ML Deep Learning",
+    "difficulty": "hard",
+    "question": "C'est quoi un réseau de neurones ?",
+    "expected_answer": "Un réseau de neurones est un modèle inspiré du cerveau humain composé de couches de neurones artificiels qui apprennent des représentations complexes des données."
+  },
+  {
+    "id": 5,
+    "category": "ML Evaluation",
+    "difficulty": "medium",
+    "question": "C'est quoi le surapprentissage ?",
+    "expected_answer": "Le surapprentissage est quand un modèle apprend trop bien les données d'entraînement et perd sa capacité à généraliser sur de nouvelles données."
+  },
+  {
+    "id": 6,
+    "category": "ML NLP",
+    "difficulty": "hard",
+    "question": "C'est quoi un transformer en NLP ?",
+    "expected_answer": "Un transformer est une architecture de réseau de neurones basée sur l'attention qui traite les séquences en parallèle, utilisée dans GPT et BERT."
+  },
+  {
+    "id": 7,
+    "category": "ML Metrics",
+    "difficulty": "medium",
+    "question": "C'est quoi la précision en machine learning ?",
+    "expected_answer": "La précision est le ratio de prédictions correctes sur le total des prédictions, mesurant la performance globale d'un modèle de classification."
+  },
+  {
+    "id": 8,
+    "category": "ML Data",
+    "difficulty": "easy",
+    "question": "C'est quoi la normalisation des données ?",
+    "expected_answer": "La normalisation est le processus de mise à l'échelle des données entre 0 et 1 pour améliorer la convergence et les performances des algorithmes ML."
+  },
+  {
+    "id": 9,
+    "category": "ML LLM",
+    "difficulty": "hard",
+    "question": "C'est quoi un LLM ?",
+    "expected_answer": "Un LLM ou Large Language Model est un modèle de langage entraîné sur d'énormes quantités de texte capable de générer, comprendre et traduire du texte."
+  },
+  {
+    "id": 10,
+    "category": "ML RAG",
+    "difficulty": "hard",
+    "question": "C'est quoi le RAG en IA ?",
+    "expected_answer": "Le RAG ou Retrieval Augmented Generation combine la recherche de documents pertinents avec la génération de texte par un LLM pour des réponses plus précises."
+  }
+]

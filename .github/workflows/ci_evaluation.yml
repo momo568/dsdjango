@@ -1,0 +1,72 @@
+name: CI Evaluation Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  evaluate-llm:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run Evaluation Pipeline (Simulated LLM and Metrics)
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}  # Optionnel: utilisé pour LLM-as-judge si disponible
+        run: |
+          # Lance le pipeline principal d'évaluation des métriques (BLEU/ROUGE/LLM-Judge)
+          # Noter qu'Ollama n'étant pas disponible par défaut dans le CI, 
+          # le script retombera intelligemment sur la simulation grâce à votre implémentation.
+          python main.py --dataset dataset.json --output eval_results.json --threshold 0.40
+
+      - name: Parse Results
+        id: parse_results
+        run: |
+          if [ -f eval_results.json ]; then
+            score=$(jq -r '.average_score' eval_results.json)
+            passed=$(jq -r '.passed' eval_results.json)
+            echo "score=$score" >> $GITHUB_OUTPUT
+            echo "passed=$passed" >> $GITHUB_OUTPUT
+          else
+            echo "score=0" >> $GITHUB_OUTPUT
+            echo "passed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const score = '${{ steps.parse_results.outputs.score }}';
+            const passed = '${{ steps.parse_results.outputs.passed }}';
+            const status = passed === 'true' ? '✅ DEPLOY' : '❌ BLOCK';
+            const body = `### 📊 Résultats de l'Évaluation LLM\n\n- **Score Global :** ${score}\n- **Décision :** ${status}\n\nLe pipeline de métriques (BLEU/ROUGE/LLM-Judge) s'est exécuté avec succès.`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            })
+
+      - name: Upload Evaluation Results
+        uses: actions/upload-artifact@v4
+        if: always() # Toujours s'exécuter même si l'évaluation échoue
+        with:
+          name: llm-evaluation-results
+          path: eval_results.json

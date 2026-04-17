@@ -1,0 +1,6 @@
+openai
+rouge-score
+nltk
+python-dotenv
+ollama
+scikit-learn

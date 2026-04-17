@@ -1,0 +1,14 @@
+{
+  "bleu_score": 0.2169,
+  "rouge_score": 0.5742,
+  "llm_judge_score": 0.7316,
+  "average_score": 0.5814,
+  "total_questions": 3,
+  "passed_questions": 2,
+  "failed_questions": 1,
+  "formula": "BLEU×0.2 + ROUGE×0.3 + Judge×0.5",
+  "passed": true,
+  "decision": "DEPLOY",
+  "threshold": 0.55,
+  "evaluated_at": "2026-04-08T08:18:12.934430"
+}

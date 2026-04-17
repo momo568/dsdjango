@@ -1,0 +1,65 @@
+{
+  "solution": "Prompt Engineering",
+  "dataset": "dataset_ml.json",
+  "model": "llama3:8b",
+  "results": [
+    {
+      "prompt_name": "baseline",
+      "system_prompt": "Tu es un assistant. Réponds en français.",
+      "model": "llama3:8b",
+      "bleu_score": 0.2398,
+      "rouge_score": 0.5534,
+      "llm_judge_score": 0.7087,
+      "average_score": 0.5683,
+      "total_questions": 3,
+      "passed_questions": 1,
+      "failed_questions": 2,
+      "formula": "BLEU×0.2 + ROUGE×0.3 + Judge×0.5",
+      "passed": true
+    },
+    {
+      "prompt_name": "expert",
+      "system_prompt": "Tu es un ingénieur Django Senior avec 10 ans d'expérience. Tu donnes des réponses techniques, précises et concises en français. Tu vas directement à l'essentiel sans introduction inutile.",
+      "model": "llama3:8b",
+      "bleu_score": 0.2454,
+      "rouge_score": 0.5349,
+      "llm_judge_score": 0.6884,
+      "average_score": 0.5537,
+      "total_questions": 3,
+      "passed_questions": 1,
+      "failed_questions": 2,
+      "formula": "BLEU×0.2 + ROUGE×0.3 + Judge×0.5",
+      "passed": true
+    },
+    {
+      "prompt_name": "few_shot",
+      "system_prompt": "Tu es un expert Django. Réponds en français.\n\nExemples de bonnes réponses :\n\nQ: C'est quoi Django ?\nR: Django est un framework web Python de haut niveau qui encourage un développement rapide et propre avec un design pragmatique.\n\nQ: Comment fonctionne l'ORM Django ?\nR: L'ORM Django mappe les modèles Python aux tables de base de données, permettant d'écrire des requêtes en Python au lieu de SQL.\n\nMaintenant réponds à la question suivante de la même manière :",
+      "model": "llama3:8b",
+      "bleu_score": 0.2323,
+      "rouge_score": 0.5553,
+      "llm_judge_score": 0.7108,
+      "average_score": 0.5685,
+      "total_questions": 3,
+      "passed_questions": 2,
+      "failed_questions": 1,
+      "formula": "BLEU×0.2 + ROUGE×0.3 + Judge×0.5",
+      "passed": true
+    },
+    {
+      "prompt_name": "concis",
+      "system_prompt": "Tu es un expert Django. RÈGLES STRICTES : 1) Réponds en français UNIQUEMENT. 2) Maximum 2 phrases. 3) Pas d'introduction. 4) Utilise les mots techniques exacts.",
+      "model": "llama3:8b",
+      "bleu_score": 0.2886,
+      "rouge_score": 0.4695,
+      "llm_judge_score": 0.6164,
+      "average_score": 0.5068,
+      "total_questions": 3,
+      "passed_questions": 1,
+      "failed_questions": 2,
+      "formula": "BLEU×0.2 + ROUGE×0.3 + Judge×0.5",
+      "passed": false
+    }
+  ],
+  "winner": "few_shot",
+  "winner_score": 0.5685
+}

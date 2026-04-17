@@ -1,0 +1,102 @@
+{
+  "dataset": "dataset_english.json",
+  "prompt_comparison": {
+    "results": [
+      {
+        "version_name": "prompt_v1_simple",
+        "model": "llama3.2:1b",
+        "system_prompt": "Tu es un assistant Django. Réponds en français.",
+        "bleu_score": 0.0469,
+        "rouge_score": 0.1623,
+        "llm_judge_score": 0.2785,
+        "average_score": 0.1973,
+        "total_questions": 10,
+        "passed_questions": 0,
+        "failed_questions": 10,
+        "formula": "BLEU×0.2 + ROUGE×0.3 + Judge×0.5",
+        "evaluated_at": "2026-04-08T15:08:28.375009"
+      },
+      {
+        "version_name": "prompt_v2_expert",
+        "model": "llama3.2:1b",
+        "system_prompt": "Tu es un expert Django senior. Donne des réponses précises et concises en français.",
+        "bleu_score": 0.0518,
+        "rouge_score": 0.1807,
+        "llm_judge_score": 0.2988,
+        "average_score": 0.214,
+        "total_questions": 10,
+        "passed_questions": 0,
+        "failed_questions": 10,
+        "formula": "BLEU×0.2 + ROUGE×0.3 + Judge×0.5",
+        "evaluated_at": "2026-04-08T15:09:23.012547"
+      },
+      {
+        "version_name": "prompt_v3_concis",
+        "model": "llama3.2:1b",
+        "system_prompt": "Tu es un assistant Django. Réponds en UNE seule phrase courte. Maximum 20 mots.",
+        "bleu_score": 0.1168,
+        "rouge_score": 0.1347,
+        "llm_judge_score": 0.2482,
+        "average_score": 0.1879,
+        "total_questions": 10,
+        "passed_questions": 0,
+        "failed_questions": 10,
+        "formula": "BLEU×0.2 + ROUGE×0.3 + Judge×0.5",
+        "evaluated_at": "2026-04-08T15:09:41.152939"
+      }
+    ],
+    "winner": "prompt_v2_expert",
+    "winner_score": 0.214,
+    "compared_at": "2026-04-08T15:09:41.153355"
+  },
+  "model_comparison": {
+    "results": [
+      {
+        "version_name": "llama3.2:1b (léger)",
+        "model": "llama3.2:1b",
+        "system_prompt": "Tu es un expert Django. Réponds en français de manière concise.",
+        "bleu_score": 0.0457,
+        "rouge_score": 0.1549,
+        "llm_judge_score": 0.2704,
+        "average_score": 0.1908,
+        "total_questions": 10,
+        "passed_questions": 0,
+        "failed_questions": 10,
+        "formula": "BLEU×0.2 + ROUGE×0.3 + Judge×0.5",
+        "evaluated_at": "2026-04-08T15:10:35.115700"
+      },
+      {
+        "version_name": "llama3.2:3b (moyen)",
+        "model": "llama3.2:3b",
+        "system_prompt": "Tu es un expert Django. Réponds en français de manière concise.",
+        "bleu_score": 0.0483,
+        "rouge_score": 0.161,
+        "llm_judge_score": 0.2771,
+        "average_score": 0.1965,
+        "total_questions": 10,
+        "passed_questions": 0,
+        "failed_questions": 10,
+        "formula": "BLEU×0.2 + ROUGE×0.3 + Judge×0.5",
+        "evaluated_at": "2026-04-08T15:12:11.776533"
+      },
+      {
+        "version_name": "mistral (puissant)",
+        "model": "mistral:latest",
+        "system_prompt": "Tu es un expert Django. Réponds en français de manière concise.",
+        "bleu_score": 0.0442,
+        "rouge_score": 0.1268,
+        "llm_judge_score": 0.2395,
+        "average_score": 0.1666,
+        "total_questions": 10,
+        "passed_questions": 0,
+        "failed_questions": 10,
+        "formula": "BLEU×0.2 + ROUGE×0.3 + Judge×0.5",
+        "evaluated_at": "2026-04-08T15:15:08.805223"
+      }
+    ],
+    "winner": "llama3.2:3b (moyen)",
+    "winner_score": 0.1965,
+    "compared_at": "2026-04-08T15:15:08.805891"
+  },
+  "generated_at": "2026-04-08T15:15:08.805900"
+}

@@ -1,0 +1,34 @@
+{
+  "results": {
+    "Django (FR)": {
+      "1. Sans RAG": 0.6193,
+      "2. Prompt Eng.": 0,
+      "3. RAG": 0.9246,
+      "4. Auto-Correction": 0.6347
+    },
+    "Django (EN)": {
+      "1. Sans RAG": 0.2257,
+      "2. Prompt Eng.": 0,
+      "3. RAG": 0.4761,
+      "4. Auto-Correction": 0.9045
+    },
+    "Python (FR)": {
+      "1. Sans RAG": 0.4837,
+      "2. Prompt Eng.": 0,
+      "3. RAG": 0.9451,
+      "4. Auto-Correction": 0.5698
+    },
+    "ML (FR)": {
+      "1. Sans RAG": 0.6368,
+      "2. Prompt Eng.": 0,
+      "3. RAG": 0.9177,
+      "4. Auto-Correction": 0.5814
+    }
+  },
+  "best_overall": {
+    "score": 0.9451,
+    "solution": "3. RAG",
+    "dataset": "Python (FR)"
+  },
+  "generated_at": "2026-04-08T09:18:12.938159"
+}
