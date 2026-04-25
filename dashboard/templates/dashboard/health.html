@@ -1,0 +1,176 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}État Système — LLM Eval{% endblock %}
+{% block nav_health %}active{% endblock %}
+{% block topbar_crumb %}etat-systeme{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-top">
+    <div>
+      <div class="page-title">État Système</div>
+      <div class="page-subtitle">Release Gate combiné — Offline + Online</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Big status block ── -->
+<div class="panel" style="
+  text-align:center;padding:40px 24px;margin-bottom:20px;
+  {% if health == 'healthy' %}background:rgba(0,255,136,.03);border-color:rgba(0,255,136,.2);
+  {% elif health == 'degraded' %}background:rgba(255,179,64,.03);border-color:rgba(255,179,64,.2);
+  {% elif health == 'critical' %}background:rgba(255,77,106,.03);border-color:rgba(255,77,106,.2);
+  {% else %}background:var(--surface);border-color:var(--border);{% endif %}
+">
+  <div style="font-size:48px;margin-bottom:12px;line-height:1">
+    {% if health == 'healthy' %}<span style="color:var(--green)">●</span>
+    {% elif health == 'degraded' %}<span style="color:var(--amber)">◆</span>
+    {% elif health == 'critical' %}<span style="color:var(--red)">■</span>
+    {% else %}<span style="color:var(--muted)">?</span>{% endif %}
+  </div>
+  <div style="font-family:var(--mono);font-size:22px;font-weight:600;letter-spacing:.2em;
+    {% if health == 'healthy' %}color:var(--green);
+    {% elif health == 'degraded' %}color:var(--amber);
+    {% elif health == 'critical' %}color:var(--red);
+    {% else %}color:var(--muted);{% endif %}margin-bottom:8px">
+    {% if health == 'healthy' %}OPÉRATIONNEL
+    {% elif health == 'degraded' %}DÉGRADÉ
+    {% elif health == 'critical' %}CRITIQUE
+    {% else %}INCONNU{% endif %}
+  </div>
+  <div style="font-size:12px;color:var(--muted2);font-weight:300">
+    {% if health == 'healthy' %}Tous les indicateurs sont dans les seuils normaux
+    {% elif health == 'degraded' %}Certains indicateurs dépassent les seuils de vigilance
+    {% elif health == 'critical' %}Des indicateurs critiques ont été déclenchés — intervention requise
+    {% else %}Aucune donnée disponible{% endif %}
+  </div>
+</div>
+
+<!-- ── Détail indicateurs ── -->
+<div class="grid-2">
+
+  <!-- Online -->
+  <div>
+    <div class="section-hd"><div class="section-hd-title">Online</div><div class="section-hd-tag">Online</div></div>
+    <div class="panel" style="padding:0;overflow:hidden">
+      <table class="data-table">
+        <thead><tr><th>Indicateur</th><th>Valeur</th><th>Warn</th><th>Crit</th><th>État</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Taux d'Erreur</td>
+            <td class="mono">{{ summary.error_rate }}%</td><td class="mono" style="color:var(--muted)">2.0%</td><td class="mono" style="color:var(--muted)">10%</td>
+            <td>{% if summary.error_rate > 10 %}<span class="tag tag-red">CRITIQUE</span>{% elif summary.error_rate > 2 %}<span class="tag tag-amber">DÉGRADÉ</span>{% else %}<span class="tag tag-green">OK</span>{% endif %}</td>
+          </tr>
+          <tr>
+            <td>Latence Moy.</td>
+            <td class="mono">{{ summary.avg_latency_ms }} ms</td><td class="mono" style="color:var(--muted)">3 000</td><td class="mono" style="color:var(--muted)">10 000</td>
+            <td>{% if summary.avg_latency_ms > 10000 %}<span class="tag tag-red">CRITIQUE</span>{% elif summary.avg_latency_ms > 3000 %}<span class="tag tag-amber">DÉGRADÉ</span>{% else %}<span class="tag tag-green">OK</span>{% endif %}</td>
+          </tr>
+          <tr>
+            <td>Alertes Drift</td>
+            <td class="mono">{{ summary.drift_alert_count }}</td><td class="mono" style="color:var(--muted)">1</td><td class="mono" style="color:var(--muted)">5</td>
+            <td>{% if summary.drift_alert_count > 5 %}<span class="tag tag-red">CRITIQUE</span>{% elif summary.drift_alert_count > 1 %}<span class="tag tag-amber">DÉGRADÉ</span>{% else %}<span class="tag tag-green">OK</span>{% endif %}</td>
+          </tr>
+          <tr>
+            <td>Requêtes (5 min)</td>
+            <td class="mono">{{ summary.total_requests }}</td><td class="mono" style="color:var(--muted)">—</td><td class="mono" style="color:var(--muted)">—</td>
+            <td><span class="tag tag-cyan">INFO</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Offline Gate -->
+  <div>
+    <div class="section-hd"><div class="section-hd-title">Offline Gate</div><div class="section-hd-tag">Offline</div></div>
+    <div class="gate-block {% if offline.passed %}gate-deploy{% else %}gate-block-fail{% endif %}" style="padding:20px;margin-bottom:12px">
+      <div class="gate-icon" style="font-size:22px;margin-bottom:6px">{% if offline.passed %}✦{% else %}✗{% endif %}</div>
+      <div class="gate-decision" style="font-size:14px">{{ offline.decision|default:"—" }}</div>
+      <div class="gate-meta">Score {{ offline.average_score|default:"—" }} · Seuil {{ offline.threshold|default:"—" }}</div>
+    </div>
+    <div class="panel" style="padding:0;overflow:hidden">
+      <table class="data-table">
+        <tbody>
+          <tr><td class="mono">BLEU</td><td class="mono" style="text-align:right">{{ offline.bleu_score|default:"—" }}</td><td style="color:var(--muted);font-size:10px">poids 15%</td></tr>
+          <tr><td class="mono">ROUGE-L</td><td class="mono" style="text-align:right">{{ offline.rouge_score|default:"—" }}</td><td style="color:var(--muted);font-size:10px">poids 25%</td></tr>
+          <tr><td class="mono">LLM Judge</td><td class="mono" style="text-align:right">{{ offline.llm_judge_score|default:"—" }}</td><td style="color:var(--muted);font-size:10px">poids 40%</td></tr>
+          <tr>
+            <td class="mono">Sécurité <span class="tag tag-amber" style="font-size:8px">VETO</span></td>
+            <td class="mono" style="text-align:right;color:{% if offline.security_score < 1.0 %}var(--red){% else %}var(--green){% endif %}">{{ offline.security_score|default:"—" }}</td>
+            <td style="color:var(--muted);font-size:10px">poids 20%</td>
+          </tr>
+          <tr style="border-top:1px solid var(--border)">
+            <td class="mono" style="font-weight:600;color:var(--text)">Score Final</td>
+            <td class="mono" style="text-align:right;font-weight:600;font-size:14px;color:var(--cyan)">{{ offline.average_score|default:"—" }}</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── Jauges visuelles ── -->
+<div class="section-hd" style="margin-top:4px"><div class="section-hd-title">Jauges de Santé Combinées</div></div>
+<div class="grid-2">
+  <div class="chart-box">
+    <div class="chart-label">Scores Offline — Doughnut</div>
+    <div class="chart-wrap" style="height:220px">
+      <canvas id="healthDoughnut" role="img" aria-label="Jauges des scores offline BLEU ROUGE Judge Sécurité"></canvas>
+    </div>
+  </div>
+  <div class="chart-box">
+    <div class="chart-label">Indicateurs Online — Radar (inversé : 1 = bon)</div>
+    <div class="chart-wrap" style="height:220px">
+      <canvas id="healthRadar" role="img" aria-label="Radar des indicateurs online normalisés, 1 signifie optimal"></canvas>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* Offline doughnut */
+new Chart(document.getElementById('healthDoughnut'),{
+  type:'doughnut',
+  data:{
+    labels:['BLEU (15%)','ROUGE (25%)','LLM Judge (40%)','Sécurité (20%)'],
+    datasets:[{
+      data:[{{ offline.bleu_score|default:0 }},{{ offline.rouge_score|default:0 }},
+            {{ offline.llm_judge_score|default:0 }},{{ offline.security_score|default:0 }}],
+      backgroundColor:['#00d4ff33','#00ff8833','#ffb34033','{% if offline.security_score < 1.0 %}#ff4d6a33{% else %}#00ff8833{% endif %}'],
+      borderColor:['#00d4ff','#00ff88','#ffb340','{% if offline.security_score < 1.0 %}#ff4d6a{% else %}#00ff88{% endif %}'],
+      borderWidth:2,hoverOffset:6,
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,cutout:'60%',
+    plugins:{legend:{position:'bottom',labels:{boxWidth:8,padding:10,font:{size:9}}}}
+  }
+});
+
+/* Online radar — inversé */
+const eN=Math.min({{ summary.error_rate|default:0 }}/10,1);
+const lN=Math.min({{ summary.avg_latency_ms|default:0 }}/10000,1);
+const dN=Math.min({{ summary.drift_alert_count|default:0 }}/5,1);
+new Chart(document.getElementById('healthRadar'),{
+  type:'radar',
+  data:{
+    labels:['Taux Erreur\n(inv.)','Latence\n(inv.)','Drift Alerts\n(inv.)','Disponibilité'],
+    datasets:[{
+      label:'État Online',
+      data:[+(1-eN).toFixed(2),+(1-lN).toFixed(2),+(1-dN).toFixed(2),1],
+      backgroundColor:'rgba(0,255,136,.1)',
+      borderColor:'#00ff88',
+      borderWidth:1.5,pointBackgroundColor:'#00ff88',pointRadius:4,
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    scales:{r:{min:0,max:1,ticks:{stepSize:.25,backdropColor:'transparent'},grid:{color:'rgba(255,255,255,.06)'}}},
+    plugins:{legend:{display:false}}
+  }
+});
+</script>
+{% endblock %}

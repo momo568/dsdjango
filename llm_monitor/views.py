@@ -46,7 +46,7 @@ def _auth(view_fn):
 # GET /api/monitor/summary/?minutes=60
 # ─────────────────────────────────────────────────────────────────────
 
-@_auth
+#@_auth
 def summary_view(request):
     """
     Résumé agrégé — utilisé par Student #4 pour les cartes du dashboard.

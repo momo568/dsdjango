@@ -1,0 +1,205 @@
+{% extends 'dashboard/base.html' %}
+{% load custom_filters %}
+{% block title %}Monitoring Online — LLM Eval{% endblock %}
+{% block nav_online %}active{% endblock %}
+{% block topbar_crumb %}monitoring-online{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-top">
+    <div>
+      <div class="page-title">Monitoring Online</div>
+      <div class="page-subtitle">Guards, latence, drift en temps réel</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <!-- Fenêtre temporelle -->
+      <div style="display:flex;gap:4px">
+        {% for m in "15,30,60,120"|split:"," %}
+        <a href="?minutes={{ m }}" class="tag {% if minutes|stringformat:'s' == m %}tag-cyan{% else %}tag-muted{% endif %}" style="cursor:pointer;padding:4px 10px">{{ m }}m</a>
+        {% endfor %}
+      </div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);padding:4px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:3px" id="last-refresh"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── KPIs ── -->
+<div class="kpi-grid">
+  <div class="kpi-card {% if summary.error_rate > 10 %}crit{% elif summary.error_rate > 2 %}warn{% else %}ok{% endif %}" style="animation-delay:.05s">
+    <div class="kpi-label">Taux d'Erreur</div>
+    <div class="kpi-value">{{ summary.error_rate|default:"0" }}<span style="font-size:14px">%</span></div>
+    <div class="kpi-sub">{{ summary.error_count|default:"0" }} erreurs · {{ summary.total_requests|default:"0" }} req.</div>
+  </div>
+  <div class="kpi-card {% if summary.avg_latency_ms > 10000 %}crit{% elif summary.avg_latency_ms > 3000 %}warn{% endif %}" style="animation-delay:.1s">
+    <div class="kpi-label">Latence Moyenne</div>
+    <div class="kpi-value">{{ summary.avg_latency_ms|default:"—" }}<span style="font-size:12px;color:var(--muted)"> ms</span></div>
+    <div class="kpi-sub">max {{ summary.max_latency_ms|default:"—" }} ms · min {{ summary.min_latency_ms|default:"—" }} ms</div>
+  </div>
+  <div class="kpi-card {% if summary.drift_alert_count > 5 %}crit{% elif summary.drift_alert_count > 1 %}warn{% endif %}" style="animation-delay:.15s">
+    <div class="kpi-label">Alertes Drift</div>
+    <div class="kpi-value">{{ summary.drift_alert_count|default:"0" }}</div>
+    <div class="kpi-sub">score moy. {{ summary.avg_drift_score|default:"0" }}</div>
+  </div>
+  <div class="kpi-card info" style="animation-delay:.2s">
+    <div class="kpi-label">Requêtes</div>
+    <div class="kpi-value">{{ summary.total_requests|default:"0" }}</div>
+    <div class="kpi-sub">tokens moy. {{ summary.avg_tokens|default:"0" }}</div>
+  </div>
+  <div class="kpi-card muted" style="animation-delay:.25s">
+    <div class="kpi-label">Drift Max</div>
+    <div class="kpi-value">{{ summary.max_drift_score|default:"0" }}</div>
+    <div class="kpi-sub">seuil alerte 0.35</div>
+  </div>
+</div>
+
+<!-- ── Time series charts ── -->
+<div class="grid-2">
+  <div class="chart-box">
+    <div class="chart-label"><span class="live-dot"></span>Latence par minute (ms)</div>
+    <div class="chart-wrap" style="height:220px">
+      <canvas id="latencyChart" role="img" aria-label="Latence moyenne du LLM par minute en millisecondes"></canvas>
+    </div>
+  </div>
+  <div class="chart-box">
+    <div class="chart-label"><span class="live-dot"></span>Drift Score par minute</div>
+    <div class="chart-wrap" style="height:220px">
+      <canvas id="driftChart" role="img" aria-label="Score de drift sémantique par minute"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ── Combo chart ── -->
+<div class="chart-box" style="margin-bottom:16px">
+  <div class="chart-label">Vue combinée — Latence + Drift (double axe)</div>
+  <div class="chart-wrap" style="height:240px">
+    <canvas id="comboChart" role="img" aria-label="Vue combinée latence et drift sur double axe Y"></canvas>
+  </div>
+</div>
+
+<!-- ── Live flux ── -->
+<div class="section-hd">
+  <div class="section-hd-title"><span class="live-dot"></span>Flux Live</div>
+  <div class="section-hd-tag">{{ recent|length }} entrées — 10 dernières min.</div>
+  <div class="section-hd-spacer"></div>
+  <span class="section-hd-action" onclick="loadCharts()">↺ Rafraîchir</span>
+</div>
+<div class="panel" style="padding:0;overflow:hidden">
+  <table class="data-table">
+    <thead><tr>
+      <th>Heure</th><th>Endpoint</th><th>Code HTTP</th>
+      <th>Latence</th><th>Tokens</th><th>Drift</th><th>Statut</th>
+    </tr></thead>
+    <tbody id="live-body">
+      {% for m in recent %}
+      <tr>
+        <td class="mono" style="color:var(--muted2)">{{ m.recorded_at|date:"H:i:s" }}</td>
+        <td class="mono" style="font-size:9px;color:var(--muted2);max-width:160px;overflow:hidden;text-overflow:ellipsis">{{ m.path }}</td>
+        <td class="mono">
+          <span class="tag {% if m.status_code >= 500 %}tag-red{% elif m.status_code >= 400 %}tag-amber{% else %}tag-green{% endif %}">{{ m.status_code }}</span>
+        </td>
+        <td class="mono">{{ m.latency_ms|floatformat:0 }} ms</td>
+        <td class="mono">{{ m.total_tokens }}</td>
+        <td class="mono {% if m.drift_alert %}" style="color:var(--amber){% endif %}">
+          {{ m.drift_score|floatformat:3 }}
+          {% if m.drift_alert %}<span style="color:var(--amber)"> ⚑</span>{% endif %}
+        </td>
+        <td>
+          {% if m.is_error %}<span class="tag tag-red">ERR</span>
+          {% else %}<span class="tag tag-green">OK</span>{% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;font-family:var(--mono);font-size:11px">
+        Aucune donnée — exécutez : <code style="background:var(--surface2);padding:2px 8px;border-radius:3px">python manage.py seed_metrics --count 300 --drift-spike --error-burst</code>
+      </td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* Django template filter "split" n'existe pas — on redéfinit les liens via JS */
+document.querySelectorAll('a[href*="?minutes="]').forEach(a=>{
+  const m=a.href.split('minutes=')[1];
+  if(m===String({{ minutes }})) a.style.setProperty('--active','1');
+});
+
+let lChart,dChart,cChart;
+
+async function loadCharts(){
+  const minutes={{ minutes }};
+  const res=await fetch(`{% url 'api-summary' %}?minutes=${minutes}`);
+  const d=await res.json();
+
+  const mkLine=(ctx,dataset,color,yID)=>({
+    type:'line',label:dataset.label,data:dataset.data,
+    borderColor:color,backgroundColor:color.replace(')',',0.08)').replace('rgb','rgba'),
+    borderWidth:1.5,fill:true,tension:.35,pointRadius:0,yAxisID:yID||'y'
+  });
+
+  /* Latency */
+  if(lChart)lChart.destroy();
+  lChart=new Chart(document.getElementById('latencyChart'),{
+    type:'line',
+    data:{datasets:[mkLine(null,{label:'Latence (ms)',data:d.latency_series},'#00d4ff')]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      scales:{
+        x:{type:'time',time:{unit:'minute',displayFormats:{minute:'HH:mm'}},grid:{color:'rgba(255,255,255,.04)'}},
+        y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{callback:v=>v+'ms'}}
+      },
+      plugins:{legend:{display:false}}
+    }
+  });
+
+  /* Drift */
+  if(dChart)dChart.destroy();
+  dChart=new Chart(document.getElementById('driftChart'),{
+    type:'line',
+    data:{datasets:[{
+      label:'Drift Score',data:d.drift_series,
+      borderColor:'#ffb340',backgroundColor:'rgba(255,179,64,.06)',
+      borderWidth:1.5,fill:true,tension:.35,pointRadius:0,
+    }]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      scales:{
+        x:{type:'time',time:{unit:'minute',displayFormats:{minute:'HH:mm'}},grid:{color:'rgba(255,255,255,.04)'}},
+        y:{min:0,max:1,grid:{color:'rgba(255,255,255,.04)'}}
+      },
+      plugins:{legend:{display:false}}
+    }
+  });
+
+  /* Combo */
+  if(cChart)cChart.destroy();
+  cChart=new Chart(document.getElementById('comboChart'),{
+    data:{datasets:[
+      {type:'line',label:'Latence (ms)',data:d.latency_series,
+       borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.04)',
+       borderWidth:1.5,fill:true,tension:.3,pointRadius:0,yAxisID:'y'},
+      {type:'line',label:'Drift Score',data:d.drift_series,
+       borderColor:'#ffb340',backgroundColor:'transparent',
+       borderWidth:1.5,fill:false,tension:.3,pointRadius:0,yAxisID:'y2',
+       borderDash:[4,3]},
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      scales:{
+        x:{type:'time',time:{unit:'minute',displayFormats:{minute:'HH:mm'}},grid:{color:'rgba(255,255,255,.04)'}},
+        y:{position:'left',grid:{color:'rgba(255,255,255,.04)'},ticks:{callback:v=>v+'ms'}},
+        y2:{position:'right',min:0,max:1,grid:{display:false}},
+      },
+      plugins:{legend:{display:false}}
+    }
+  });
+
+  document.getElementById('last-refresh').textContent='↺ '+new Date().toLocaleTimeString('fr-FR');
+}
+loadCharts();
+setInterval(loadCharts,30000);
+</script>
+{% endblock %}

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}LLM Eval{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#090b10;--surface:#0f1218;--surface2:#161b24;--surface3:#1c232f;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
+  --green:#00ff88;--cyan:#00d4ff;--amber:#ffb340;--red:#ff4d6a;
+  --text:#e8eaf0;--muted:#5a6478;--muted2:#8892a4;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+  --r:6px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;display:flex;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+/* ── sidebar ── */
+.sidebar{
+  width:230px;min-width:230px;background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;overflow:hidden;
+  z-index:100;
+}
+.sb-logo{
+  padding:28px 24px 22px;
+  border-bottom:1px solid var(--border);
+}
+.sb-logo-mark{
+  display:flex;align-items:center;gap:10px;margin-bottom:6px;
+}
+.sb-logo-icon{
+  width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,rgba(0,255,136,.15),rgba(0,212,255,.08));
+  border:1px solid rgba(0,255,136,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:13px;font-weight:600;color:var(--green);
+}
+.sb-logo-name{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text);letter-spacing:.12em;text-transform:uppercase}
+.sb-logo-sub{font-size:10px;color:var(--muted);font-family:var(--mono);letter-spacing:.06em}
+.sb-nav{flex:1;padding:16px 0;overflow-y:auto}
+.sb-section{font-size:9px;font-family:var(--mono);letter-spacing:.15em;color:var(--muted);text-transform:uppercase;padding:12px 24px 6px}
+.nav-link{
+  display:flex;align-items:center;gap:12px;
+  padding:9px 24px;font-size:12px;font-family:var(--sans);font-weight:400;
+  color:var(--muted2);cursor:pointer;
+  border-left:2px solid transparent;
+  transition:all .15s ease;position:relative;
+}
+.nav-link:hover{color:var(--text);background:rgba(255,255,255,.03);border-left-color:var(--border2)}
+.nav-link.active{color:var(--green);border-left-color:var(--green);background:rgba(0,255,136,.04)}
+.nav-link.active .nav-icon{color:var(--green)}
+.nav-icon{width:16px;height:16px;opacity:.6;flex-shrink:0}
+.nav-link.active .nav-icon{opacity:1}
+.nav-badge{
+  margin-left:auto;font-family:var(--mono);font-size:9px;
+  background:rgba(0,255,136,.12);color:var(--green);
+  border:1px solid rgba(0,255,136,.25);
+  padding:2px 6px;border-radius:3px;letter-spacing:.05em;
+}
+.nav-badge.red{background:rgba(255,77,106,.12);color:var(--red);border-color:rgba(255,77,106,.25)}
+.nav-badge.amber{background:rgba(255,179,64,.12);color:var(--amber);border-color:rgba(255,179,64,.25)}
+.sb-footer{
+  padding:16px 24px;border-top:1px solid var(--border);
+  font-family:var(--mono);font-size:9px;color:var(--muted);
+  display:flex;align-items:center;gap:8px;letter-spacing:.06em;
+}
+.sb-footer-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+/* ── main layout ── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 32px;height:56px;display:flex;align-items:center;
+  justify-content:space-between;position:sticky;top:0;z-index:50;
+  flex-shrink:0;
+}
+.topbar-left{display:flex;align-items:center;gap:16px}
+.topbar-path{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:10px;color:var(--muted);
+  letter-spacing:.06em;
+}
+.topbar-path span{color:var(--text)}
+.topbar-title{
+  font-family:var(--mono);font-size:11px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--text);
+}
+.topbar-sep{color:var(--muted);font-size:14px}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-clock{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.06em}
+.topbar-health{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:9px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;
+  padding:4px 10px;border-radius:3px;
+}
+.th-ok{background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.25)}
+.th-warn{background:rgba(255,179,64,.1);color:var(--amber);border:1px solid rgba(255,179,64,.25)}
+.th-crit{background:rgba(255,77,106,.1);color:var(--red);border:1px solid rgba(255,77,106,.25)}
+.th-unk{background:rgba(255,255,255,.05);color:var(--muted2);border:1px solid var(--border2)}
+.th-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+/* ── page content ── */
+.content{flex:1;padding:28px 32px;overflow-y:auto}
+/* ── page header ── */
+.page-header{margin-bottom:28px}
+.page-header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:4px}
+.page-title{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--text);letter-spacing:.04em}
+.page-subtitle{font-size:12px;color:var(--muted2);margin-top:4px;font-weight:300}
+/* ── KPI grid ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:24px}
+.kpi-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:18px 20px;
+  position:relative;overflow:hidden;
+  transition:border-color .2s,transform .15s;
+  animation:slideUp .4s ease both;
+}
+.kpi-card:hover{border-color:var(--border2);transform:translateY(-1px)}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.kpi-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--green);opacity:.6;
+}
+.kpi-card.warn::after{background:var(--amber)}
+.kpi-card.crit::after{background:var(--red)}
+.kpi-card.info::after{background:var(--cyan)}
+.kpi-card.muted::after{background:var(--muted)}
+.kpi-label{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.kpi-value{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--text);line-height:1;margin-bottom:4px}
+.kpi-card.ok   .kpi-value{color:var(--green)}
+.kpi-card.warn .kpi-value{color:var(--amber)}
+.kpi-card.crit .kpi-value{color:var(--red)}
+.kpi-card.info .kpi-value{color:var(--cyan)}
+.kpi-sub{font-size:10px;color:var(--muted);font-family:var(--mono)}
+/* ── section titles ── */
+.section-hd{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:14px;padding-bottom:10px;
+  border-bottom:1px solid var(--border);
+}
+.section-hd-title{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text)}
+.section-hd-tag{
+  font-family:var(--mono);font-size:8px;letter-spacing:.08em;
+  background:var(--surface3);color:var(--muted2);
+  border:1px solid var(--border2);padding:2px 8px;border-radius:2px;
+}
+.section-hd-spacer{flex:1}
+.section-hd-action{font-family:var(--mono);font-size:9px;color:var(--cyan);letter-spacing:.06em;cursor:pointer}
+.section-hd-action:hover{text-decoration:underline}
+/* ── panels ── */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;animation:slideUp .5s ease both}
+.panel-sm{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+/* ── grid layouts ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px}
+.grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+.grid-1-2{display:grid;grid-template-columns:1fr 2fr;gap:16px;margin-bottom:16px}
+/* ── chart boxes ── */
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.chart-label{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.chart-wrap{position:relative}
+/* ── score bars ── */
+.score-row{margin-bottom:12px}
+.score-row-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.score-name{font-family:var(--mono);font-size:10px;color:var(--muted2);letter-spacing:.04em}
+.score-val{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text)}
+.score-track{height:4px;background:var(--surface3);border-radius:2px;overflow:hidden}
+.score-fill{height:100%;border-radius:2px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.fill-green{background:var(--green)}
+.fill-cyan{background:var(--cyan)}
+.fill-amber{background:var(--amber)}
+.fill-red{background:var(--red)}
+/* ── tables ── */
+.data-table{width:100%;border-collapse:collapse;font-size:11px}
+.data-table th{font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:7px 12px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+.data-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text);font-size:11px}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:rgba(255,255,255,.02)}
+.data-table .mono{font-family:var(--mono);font-size:10px}
+/* ── tags ── */
+.tag{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.06em;padding:2px 7px;border-radius:2px;font-weight:500}
+.tag-green{background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.2)}
+.tag-red{background:rgba(255,77,106,.1);color:var(--red);border:1px solid rgba(255,77,106,.2)}
+.tag-amber{background:rgba(255,179,64,.1);color:var(--amber);border:1px solid rgba(255,179,64,.2)}
+.tag-cyan{background:rgba(0,212,255,.1);color:var(--cyan);border:1px solid rgba(0,212,255,.2)}
+.tag-muted{background:rgba(255,255,255,.04);color:var(--muted2);border:1px solid var(--border2)}
+/* ── gate decision ── */
+.gate-block{
+  text-align:center;padding:28px 24px;border-radius:var(--r);
+  border:1px solid;margin-bottom:20px;position:relative;overflow:hidden;
+}
+.gate-deploy{border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.04)}
+.gate-block-fail{border-color:rgba(255,77,106,.3);background:rgba(255,77,106,.04)}
+.gate-icon{font-size:32px;margin-bottom:10px;line-height:1}
+.gate-decision{font-family:var(--mono);font-size:18px;font-weight:600;letter-spacing:.18em;margin-bottom:6px}
+.gate-deploy .gate-decision{color:var(--green)}
+.gate-block-fail .gate-decision{color:var(--red)}
+.gate-meta{font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.7}
+/* ── live dot ── */
+.live-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s ease-in-out infinite;margin-right:6px;vertical-align:middle}
+/* ── formula box ── */
+.formula{
+  font-family:var(--mono);font-size:10px;color:var(--cyan);
+  background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);
+  border-radius:var(--r);padding:10px 14px;letter-spacing:.04em;
+  margin-top:12px;
+}
+/* ── rank medals ── */
+.medal-1{color:var(--amber)}
+.medal-2{color:var(--muted2)}
+.medal-3{color:rgba(186,109,60,.8)}
+/* ── responsive ── */
+@media(max-width:900px){
+  .sidebar{display:none}
+  .grid-2,.grid-3,.grid-2-1,.grid-1-2{grid-template-columns:1fr}
+  .content{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-mark">
+      <div class="sb-logo-icon">LM</div>
+      <div>
+        <div class="sb-logo-name">LLM Eval</div>
+      </div>
+    </div>
+    <div class="sb-logo-sub">Monitoring & Evaluation Dashboard</div>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="sb-section">Navigation</div>
+
+    <a href="{% url 'dashboard-index' %}" class="nav-link {% block nav_index %}{% endblock %}">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+        <rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      Vue Globale
+    </a>
+
+    <a href="{% url 'dashboard-offline' %}" class="nav-link {% block nav_offline %}{% endblock %}">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M8 4.5v3.5l2.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Métriques Offline
+    </a>
+
+    <a href="{% url 'dashboard-online' %}" class="nav-link {% block nav_online %}{% endblock %}">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+        <path d="M1 10 L4 6 L7 9 L10 4 L13 7 L15 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="15" cy="5" r="1.2" fill="currentColor"/>
+      </svg>
+      Monitoring Online
+      <span class="nav-badge" id="sb-health-badge"></span>
+    </a>
+
+    <a href="{% url 'dashboard-versions' %}" class="nav-link {% block nav_versions %}{% endblock %}">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+        <path d="M3 4h10M3 8h7M3 12h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="13" cy="12" r="2" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      Versions &amp; Prompts
+    </a>
+
+    <a href="{% url 'dashboard-health' %}" class="nav-link {% block nav_health %}{% endblock %}">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+        <path d="M1 8h3l2-5 3 10 2-5 2 3h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      État Système
+    </a>
+  </nav>
+
+  <div class="sb-footer">
+    <div class="sb-footer-dot"></div>
+    SYSTÈME OPÉRATIONNEL
+  </div>
+</aside>
+
+<!-- ══ MAIN ══════════════════════════════════════════ -->
+<div class="main">
+
+  <!-- topbar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-path">
+        <span style="color:var(--muted)">llm-eval</span>
+        <span style="color:var(--muted)">/</span>
+        <span>{% block topbar_crumb %}dashboard{% endblock %}</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-clock" id="clock"></div>
+      <div class="topbar-health th-unk" id="topbar-health">
+        <span class="th-dot"></span>
+        <span id="th-label">—</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- page content -->
+  <div class="content">
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+<!-- ══ GLOBAL JS ══════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script>
+/* Clock */
+(function tick(){
+  const n=new Date();
+  const el=document.getElementById('clock');
+  if(el) el.textContent=n.toLocaleDateString('fr-FR')+' '+n.toLocaleTimeString('fr-FR');
+  setTimeout(tick,1000);
+})();
+
+/* Chart.js global defaults — terminal palette */
+Chart.defaults.color='#5a6478';
+Chart.defaults.borderColor='rgba(255,255,255,.06)';
+Chart.defaults.font.family="'IBM Plex Mono',monospace";
+Chart.defaults.font.size=10;
+
+/* Fetch health badge for topbar + sidebar */
+async function loadHealthBadge(){
+  try{
+    const r=await fetch("{% url 'api-summary' %}?minutes=5");
+    const d=await r.json();
+    const h=d.health||'unknown';
+    const map={healthy:{cls:'th-ok',label:'OK',sbCls:'',sbText:'OK'},
+               degraded:{cls:'th-warn',label:'DÉGRADÉ',sbCls:'amber',sbText:'WARN'},
+               critical:{cls:'th-crit',label:'CRITIQUE',sbCls:'red',sbText:'CRIT'}};
+    const m=map[h]||{cls:'th-unk',label:'—',sbCls:'',sbText:''};
+    const th=document.getElementById('topbar-health');
+    const thl=document.getElementById('th-label');
+    if(th){th.className='topbar-health '+m.cls;thl.textContent=m.label}
+    const sb=document.getElementById('sb-health-badge');
+    if(sb&&m.sbText){sb.textContent=m.sbText;sb.className='nav-badge '+m.sbCls}
+  }catch(e){}
+}
+loadHealthBadge();
+setInterval(loadHealthBadge,30000);
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

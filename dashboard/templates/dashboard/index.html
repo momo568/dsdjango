@@ -1,0 +1,190 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Vue Globale — LLM Eval{% endblock %}
+{% block nav_index %}active{% endblock %}
+{% block topbar_crumb %}vue-globale{% endblock %}
+
+{% block content %}
+
+<!-- Page header -->
+<div class="page-header">
+  <div class="page-header-top">
+    <div>
+      <div class="page-title">Vue Globale</div>
+      <div class="page-subtitle">Analyse comparative des performances et monitoring temps réel</div>
+    </div>
+    {% if offline.decision %}
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="tag {% if offline.passed %}tag-green{% else %}tag-red{% endif %}" style="font-size:10px;padding:5px 12px;letter-spacing:.1em">
+        {{ offline.decision }}
+      </span>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ── Offline KPIs ── -->
+<div class="section-hd">
+  <div class="section-hd-title">Métriques Offline</div>
+  <div class="section-hd-spacer"></div>
+  <a class="section-hd-action" href="{% url 'dashboard-offline' %}">Voir le détail →</a>
+</div>
+
+<div class="kpi-grid" style="animation-delay:.05s">
+  <div class="kpi-card {% if offline.passed %}ok{% else %}crit{% endif %}" style="animation-delay:.05s">
+    <div class="kpi-label">Décision Gate</div>
+    <div class="kpi-value" style="font-size:18px;letter-spacing:.1em">{{ offline.decision|default:"—" }}</div>
+    <div class="kpi-sub">seuil {{ offline.threshold|default:"—" }}</div>
+  </div>
+  <div class="kpi-card info" style="animation-delay:.1s">
+    <div class="kpi-label">Score Global</div>
+    <div class="kpi-value">{{ offline.average_score|default:"—" }}</div>
+    <div class="kpi-sub">{{ offline.formula|default:"BLEU·ROUGE·Judge·Secu" }}</div>
+  </div>
+  <div class="kpi-card" style="animation-delay:.15s">
+    <div class="kpi-label">LLM Judge</div>
+    <div class="kpi-value">{{ offline.llm_judge_score|default:"—" }}</div>
+    <div class="kpi-sub">poids 40%</div>
+  </div>
+  <div class="kpi-card {% if offline.security_score and offline.security_score < 1.0 %}crit{% else %}ok{% endif %}" style="animation-delay:.2s">
+    <div class="kpi-label">Sécurité (VETO)</div>
+    <div class="kpi-value">{{ offline.security_score|default:"—" }}</div>
+    <div class="kpi-sub">{% if offline.security_score < 1.0 %}⚑ veto actif{% else %}✓ validé{% endif %}</div>
+  </div>
+  <div class="kpi-card" style="animation-delay:.25s">
+    <div class="kpi-label">Questions OK</div>
+    <div class="kpi-value">{{ offline.passed_questions|default:"0" }}<span style="font-size:14px;color:var(--muted)">/{{ offline.total_questions|default:"0" }}</span></div>
+    <div class="kpi-sub">{{ offline.failed_questions|default:"0" }} échouées</div>
+  </div>
+  <div class="kpi-card muted" style="animation-delay:.3s">
+    <div class="kpi-label">BLEU</div>
+    <div class="kpi-value">{{ offline.bleu_score|default:"—" }}</div>
+    <div class="kpi-sub">n-gram overlap</div>
+  </div>
+</div>
+
+<!-- ── Online KPIs ── -->
+<div class="section-hd" style="margin-top:8px">
+  <div class="section-hd-title">Monitoring Online</div>
+  <div class="section-hd-spacer"></div>
+  <a class="section-hd-action" href="{% url 'dashboard-online' %}">Voir le détail →</a>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi-card {% if summary.error_rate > 10 %}crit{% elif summary.error_rate > 2 %}warn{% else %}ok{% endif %}" style="animation-delay:.35s">
+    <div class="kpi-label">Taux d'Erreur</div>
+    <div class="kpi-value">{{ summary.error_rate|default:"0" }}<span style="font-size:14px">%</span></div>
+    <div class="kpi-sub">{{ summary.error_count|default:"0" }} / {{ summary.total_requests|default:"0" }} req.</div>
+  </div>
+  <div class="kpi-card {% if summary.avg_latency_ms > 10000 %}crit{% elif summary.avg_latency_ms > 3000 %}warn{% endif %}" style="animation-delay:.4s">
+    <div class="kpi-label">Latence Moyenne</div>
+    <div class="kpi-value">{{ summary.avg_latency_ms|default:"—" }}<span style="font-size:12px;color:var(--muted)"> ms</span></div>
+    <div class="kpi-sub">max {{ summary.max_latency_ms|default:"—" }} ms</div>
+  </div>
+  <div class="kpi-card {% if summary.drift_alert_count > 5 %}crit{% elif summary.drift_alert_count > 1 %}warn{% endif %}" style="animation-delay:.45s">
+    <div class="kpi-label">Alertes Drift</div>
+    <div class="kpi-value">{{ summary.drift_alert_count|default:"0" }}</div>
+    <div class="kpi-sub">score moy. {{ summary.avg_drift_score|default:"0" }}</div>
+  </div>
+  <div class="kpi-card info" style="animation-delay:.5s">
+    <div class="kpi-label">Requêtes (1h)</div>
+    <div class="kpi-value">{{ summary.total_requests|default:"0" }}</div>
+    <div class="kpi-sub">tokens moy. {{ summary.avg_tokens|default:"0" }}</div>
+  </div>
+</div>
+
+<!-- ── Charts row ── -->
+<div class="grid-2">
+  <div class="chart-box">
+    <div class="chart-label">Scores Offline — radar</div>
+    <div class="chart-wrap" style="height:230px">
+      <canvas id="radarChart" role="img" aria-label="Radar des scores offline BLEU, ROUGE, LLM Judge, Sécurité"></canvas>
+    </div>
+  </div>
+  <div class="chart-box">
+    <div class="chart-label">Performance par Solution — rapport_general.json</div>
+    <div class="chart-wrap" style="height:230px">
+      <canvas id="solutionChart" role="img" aria-label="Scores par solution et dataset"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ── Best solution banner ── -->
+{% if rapport.best_overall %}
+<div class="panel" style="display:flex;align-items:center;gap:20px;padding:16px 20px;background:rgba(0,255,136,.03);border-color:rgba(0,255,136,.15)">
+  <div style="font-size:22px">♛</div>
+  <div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px">Meilleure solution</div>
+    <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--green)">{{ rapport.best_overall.solution }}</div>
+  </div>
+  <div style="width:1px;height:36px;background:var(--border)"></div>
+  <div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px">Score</div>
+    <div style="font-family:var(--mono);font-size:20px;font-weight:600;color:var(--text)">{{ rapport.best_overall.score }}</div>
+  </div>
+  <div style="width:1px;height:36px;background:var(--border)"></div>
+  <div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px">Dataset</div>
+    <div style="font-size:12px;color:var(--muted2)">{{ rapport.best_overall.dataset }}</div>
+  </div>
+  <div style="margin-left:auto">
+    <a href="{% url 'dashboard-offline' %}" style="font-family:var(--mono);font-size:9px;color:var(--cyan);letter-spacing:.08em">DÉTAILS OFFLINE →</a>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function initIndex(){
+  const res=await fetch("{% url 'api-summary' %}?minutes=60");
+  const d=await res.json();
+
+  /* Radar */
+  new Chart(document.getElementById('radarChart'),{
+    type:'radar',
+    data:{
+      labels:['BLEU','ROUGE','LLM Judge','Sécurité','Score Final'],
+      datasets:[{
+        label:'Scores',
+        data:[d.offline_bleu,d.offline_rouge,d.offline_judge,d.offline_security||0,d.offline_avg],
+        backgroundColor:'rgba(0,255,136,.08)',
+        borderColor:'#00ff88',borderWidth:1.5,
+        pointBackgroundColor:'#00ff88',pointRadius:3,pointHoverRadius:5,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      scales:{r:{min:0,max:1,ticks:{stepSize:.25,backdropColor:'transparent'},grid:{color:'rgba(255,255,255,.06)'},pointLabels:{font:{size:10}}}},
+      plugins:{legend:{display:false}}
+    }
+  });
+
+  /* Solution bar */
+  if(d.rapport_results){
+    const dsLabels=Object.keys(d.rapport_results);
+    const solSet=new Set();
+    dsLabels.forEach(ds=>Object.keys(d.rapport_results[ds]).forEach(s=>solSet.add(s)));
+    const sols=[...solSet];
+    const palette=['#00ff88','#00d4ff','#ffb340','#ff4d6a','#a78bfa'];
+    const datasets=sols.map((s,i)=>({
+      label:s,
+      data:dsLabels.map(ds=>d.rapport_results[ds][s]||0),
+      backgroundColor:palette[i%palette.length]+'33',
+      borderColor:palette[i%palette.length],
+      borderWidth:1.5,
+    }));
+    new Chart(document.getElementById('solutionChart'),{
+      type:'bar',
+      data:{labels:dsLabels,datasets},
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        scales:{x:{grid:{display:false}},y:{min:0,max:1,grid:{color:'rgba(255,255,255,.05)'}}},
+        plugins:{legend:{position:'bottom',labels:{boxWidth:8,padding:10,font:{size:9}}}}
+      }
+    });
+  }
+}
+initIndex();
+</script>
+{% endblock %}

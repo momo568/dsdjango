@@ -110,6 +110,30 @@ class MetricsStore:
             result['offline_formula']  = offline.get('formula')
             result['offline_evaluated_at'] = offline.get('evaluated_at')
 
+        # ✅ Student #4 — Calcul du statut de santé combiné
+        # Seuils critiques online
+        is_critical = (
+            error_rate > 10  # > 10% erreurs
+            or result['avg_latency_ms'] > 10000  # > 10s
+            or result['drift_alert_count'] > 5   # > 5 alertes drift
+        )
+        # Seuils dégradés online
+        is_degraded = (
+            error_rate > 2  # > 2%
+            or result['avg_latency_ms'] > 3000  # > 3s
+            or result['drift_alert_count'] > 1  # > 1 alerte
+        )
+        # Offline failed gate
+        offline_failed = offline and not offline.get('passed', True)
+        
+        # Logique combinée
+        if is_critical or offline_failed:
+            result['health'] = 'critical'
+        elif is_degraded:
+            result['health'] = 'degraded'
+        else:
+            result['health'] = 'healthy'
+
         return result
 
     def latency_timeseries(self, minutes: int = 60):

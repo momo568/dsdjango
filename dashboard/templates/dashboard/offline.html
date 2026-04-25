@@ -1,0 +1,343 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Métriques Offline — LLM Eval{% endblock %}
+{% block nav_offline %}active{% endblock %}
+{% block topbar_crumb %}metriques-offline{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-top">
+    <div>
+      <div class="page-title">Métriques Offline</div>
+      <div class="page-subtitle">Rapport détaillé des datasets de solutions (RAG vs Baseline)</div>
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">{{ offline.evaluated_at|default:"" }}</div>
+  </div>
+</div>
+
+<!-- ── Gate banner ── -->
+<div class="gate-block {% if offline.passed %}gate-deploy{% else %}gate-block-fail{% endif %}">
+  <div class="gate-icon">{% if offline.passed %}✦{% else %}✗{% endif %}</div>
+  <div class="gate-decision">{{ offline.decision|default:"—" }}</div>
+  <div class="gate-meta">
+    Score {{ offline.average_score|default:"—" }}  ·  Seuil {{ offline.threshold|default:"—" }}  ·  {{ offline.passed_questions|default:"0" }}/{{ offline.total_questions|default:"0" }} questions validées
+    {% if offline.security_score is not None and offline.security_score < 1.0 %}
+    <br><span style="color:var(--red)">⚑  VETO SÉCURITÉ — score {{ offline.security_score }}</span>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ── Scores détaillés + chart ── -->
+<div class="grid-1-2" style="margin-bottom:16px">
+  <!-- barres -->
+  <div class="panel">
+    <div class="section-hd"><div class="section-hd-title">Scores Détaillés</div></div>
+
+    <div class="score-row">
+      <div class="score-row-head"><span class="score-name">BLEU</span><span class="score-val">{{ offline.bleu_score|default:"0" }}</span></div>
+      <div class="score-track"><div class="score-fill fill-cyan" id="fill-bleu" style="width:0%"></div></div>
+    </div>
+    <div class="score-row">
+      <div class="score-row-head"><span class="score-name">ROUGE-L</span><span class="score-val">{{ offline.rouge_score|default:"0" }}</span></div>
+      <div class="score-track"><div class="score-fill fill-green" id="fill-rouge" style="width:0%"></div></div>
+    </div>
+    <div class="score-row">
+      <div class="score-row-head"><span class="score-name">LLM Judge</span><span class="score-val">{{ offline.llm_judge_score|default:"0" }}</span></div>
+      <div class="score-track"><div class="score-fill fill-amber" id="fill-judge" style="width:0%"></div></div>
+    </div>
+    <div class="score-row">
+      <div class="score-row-head">
+        <span class="score-name">Sécurité <span class="tag tag-amber" style="font-size:8px;padding:1px 5px">VETO</span></span>
+        <span class="score-val" style="color:{% if offline.security_score < 1.0 %}var(--red){% else %}var(--green){% endif %}">{{ offline.security_score|default:"0" }}</span>
+      </div>
+      <div class="score-track"><div class="score-fill {% if offline.security_score < 1.0 %}fill-red{% else %}fill-green{% endif %}" id="fill-secu" style="width:0%"></div></div>
+    </div>
+
+    <div style="margin:16px 0;height:1px;background:var(--border)"></div>
+
+    <div class="score-row">
+      <div class="score-row-head">
+        <span class="score-name" style="color:var(--text);font-weight:500">Score Final</span>
+        <span class="score-val" style="font-size:16px;color:var(--cyan)">{{ offline.average_score|default:"0" }}</span>
+      </div>
+      <div class="score-track" style="height:6px;background:var(--surface3)">
+        <div class="score-fill fill-cyan" id="fill-avg" style="width:0%;height:100%"></div>
+      </div>
+    </div>
+
+    <div class="formula">{{ offline.formula|default:"BLEU×0.15 + ROUGE×0.25 + Judge×0.40 + Secu×0.20" }}</div>
+  </div>
+
+  <!-- horizontal bar chart -->
+  <div class="chart-box">
+    <div class="chart-label">Comparaison des Scores — vue Horizontale</div>
+    <div class="chart-wrap" style="height:260px">
+      <canvas id="scoresHBar" role="img" aria-label="Scores BLEU ROUGE Judge Sécurité comparés horizontalement"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ── Comparaison Prompts ── -->
+{% if comparison.prompt_comparison %}
+<div class="section-hd">
+  <div class="section-hd-title">Comparaison Prompts</div>
+  <div class="section-hd-tag">winner: {{ comparison.prompt_comparison.winner }}</div>
+  <div class="section-hd-spacer"></div>
+  <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">{{ comparison.prompt_comparison.results|length }} versions</span>
+</div>
+<div class="grid-2" style="margin-bottom:16px">
+  <div class="chart-box">
+    <div class="chart-label">Scores par version de prompt</div>
+    <div class="chart-wrap" style="height:240px">
+      <canvas id="promptBar" role="img" aria-label="Comparaison des scores BLEU ROUGE Judge par version de prompt"></canvas>
+    </div>
+  </div>
+  <div class="chart-box">
+    <div class="chart-label">Radar multi-prompts</div>
+    <div class="chart-wrap" style="height:240px">
+      <canvas id="promptRadar" role="img" aria-label="Radar de comparaison multi-prompts"></canvas>
+    </div>
+  </div>
+</div>
+<div class="panel" style="padding:0;overflow:hidden">
+  <table class="data-table">
+    <thead><tr>
+      <th>#</th><th>Version</th><th>Modèle</th>
+      <th>BLEU</th><th>ROUGE</th><th>Judge</th><th>Score</th><th>Résultat</th>
+    </tr></thead>
+    <tbody>
+      {% for r in comparison.prompt_comparison.results %}
+      <tr>
+        <td class="mono">
+          {% if forloop.counter == 1 %}<span class="medal-1">①</span>
+          {% elif forloop.counter == 2 %}<span class="medal-2">②</span>
+          {% else %}<span class="medal-3">③</span>{% endif %}
+        </td>
+        <td style="font-size:11px;max-width:180px">
+          {% if r.version_name == comparison.prompt_comparison.winner %}
+          <span style="color:var(--amber)">♛</span> {% endif %}{{ r.version_name }}
+        </td>
+        <td class="mono" style="color:var(--muted2)">{{ r.model }}</td>
+        <td class="mono">{{ r.bleu_score }}</td>
+        <td class="mono">{{ r.rouge_score }}</td>
+        <td class="mono">{{ r.llm_judge_score }}</td>
+        <td class="mono" style="font-weight:600;color:{% if r.version_name == comparison.prompt_comparison.winner %}var(--amber){% else %}var(--text){% endif %}">{{ r.average_score }}</td>
+        <td>
+          {% if r.passed_questions > 0 %}<span class="tag tag-green">{{ r.passed_questions }}/{{ r.total_questions }}</span>
+          {% else %}<span class="tag tag-red">0/{{ r.total_questions }}</span>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- ── Comparaison Modèles ── -->
+{% if comparison.model_comparison %}
+<div class="section-hd" style="margin-top:20px">
+  <div class="section-hd-title">Comparaison Modèles</div>
+  <div class="section-hd-tag">winner: {{ comparison.model_comparison.winner }}</div>
+</div>
+<div class="grid-2" style="margin-bottom:16px">
+  <div class="chart-box">
+    <div class="chart-label">Scores par modèle</div>
+    <div class="chart-wrap" style="height:220px">
+      <canvas id="modelBar" role="img" aria-label="Scores des différents modèles LLM"></canvas>
+    </div>
+  </div>
+  <div class="chart-box">
+    <div class="chart-label">Score Final — vue Polar</div>
+    <div class="chart-wrap" style="height:220px">
+      <canvas id="modelPolar" role="img" aria-label="Vue polaire des scores finaux par modèle"></canvas>
+    </div>
+  </div>
+</div>
+<div class="panel" style="padding:0;overflow:hidden">
+  <table class="data-table">
+    <thead><tr><th>#</th><th>Modèle</th><th>BLEU</th><th>ROUGE</th><th>Judge</th><th>Score Final</th></tr></thead>
+    <tbody>
+      {% for r in comparison.model_comparison.results %}
+      <tr>
+        <td class="mono">
+          {% if forloop.counter == 1 %}<span class="medal-1">①</span>
+          {% elif forloop.counter == 2 %}<span class="medal-2">②</span>
+          {% else %}<span class="medal-3">③</span>{% endif %}
+        </td>
+        <td style="font-weight:{% if r.version_name == comparison.model_comparison.winner %}500{% else %}400{% endif %}">
+          {% if r.version_name == comparison.model_comparison.winner %}<span style="color:var(--amber)">♛</span> {% endif %}{{ r.version_name }}
+        </td>
+        <td class="mono">{{ r.bleu_score }}</td>
+        <td class="mono">{{ r.rouge_score }}</td>
+        <td class="mono">{{ r.llm_judge_score }}</td>
+        <td class="mono" style="font-weight:600;color:{% if r.version_name == comparison.model_comparison.winner %}var(--cyan){% else %}var(--text){% endif %}">{{ r.average_score }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- ── Rapport général ── -->
+{% if rapport.results %}
+<div class="section-hd" style="margin-top:20px">
+  <div class="section-hd-title">Rapport Général — Toutes Solutions</div>
+</div>
+<div class="chart-box" style="margin-bottom:16px">
+  <div class="chart-label">Score par solution et dataset</div>
+  <div class="chart-wrap" style="height:280px">
+    <canvas id="rapportChart" role="img" aria-label="Score de chaque solution sur chaque dataset"></canvas>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* Animate score bars */
+document.addEventListener('DOMContentLoaded',()=>{
+  requestAnimationFrame(()=>{
+    setTimeout(()=>{
+      const b='{{ offline.bleu_score|default:0 }}';
+      const ro='{{ offline.rouge_score|default:0 }}';
+      const j='{{ offline.llm_judge_score|default:0 }}';
+      const s='{{ offline.security_score|default:0 }}';
+      const a='{{ offline.average_score|default:0 }}';
+      const set=(id,v)=>{const el=document.getElementById(id);if(el)el.style.width=(parseFloat(v)*100)+'%'};
+      set('fill-bleu',b);set('fill-rouge',ro);set('fill-judge',j);
+      set('fill-secu',s);set('fill-avg',a);
+    },100);
+  });
+});
+
+/* Horizontal bar scores */
+new Chart(document.getElementById('scoresHBar'),{
+  type:'bar',
+  data:{
+    labels:['BLEU','ROUGE-L','LLM Judge','Sécurité','Score Final'],
+    datasets:[{
+      data:['{{ offline.bleu_score|default:0 }}','{{ offline.rouge_score|default:0 }}',
+            '{{ offline.llm_judge_score|default:0 }}','{{ offline.security_score|default:0 }}',
+            '{{ offline.average_score|default:0 }}'],
+      backgroundColor:['#00d4ff44','#00ff8844','#ffb34044','#ff4d6a44','#00d4ff88'],
+      borderColor:['#00d4ff','#00ff88','#ffb340','#ff4d6a','#00d4ff'],
+      borderWidth:1.5,
+    }]
+  },
+  options:{
+    indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    scales:{x:{min:0,max:1,grid:{color:'rgba(255,255,255,.05)'}},y:{grid:{display:false}}},
+    plugins:{legend:{display:false}}
+  }
+});
+
+/* Prompt comparison bar */
+{% if comparison.prompt_comparison.results %}
+const pd={{ comparison.prompt_comparison.results|safe }};
+new Chart(document.getElementById('promptBar'),{
+  type:'bar',
+  data:{
+    labels:pd.map(r=>r.version_name),
+    datasets:[
+      {label:'BLEU', data:pd.map(r=>r.bleu_score), backgroundColor:'#00d4ff33',borderColor:'#00d4ff',borderWidth:1.5},
+      {label:'ROUGE',data:pd.map(r=>r.rouge_score),backgroundColor:'#00ff8833',borderColor:'#00ff88',borderWidth:1.5},
+      {label:'Judge',data:pd.map(r=>r.llm_judge_score),backgroundColor:'#ffb34033',borderColor:'#ffb340',borderWidth:1.5},
+      {label:'Final',data:pd.map(r=>r.average_score),backgroundColor:'#a78bfa33',borderColor:'#a78bfa',borderWidth:1.5},
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    scales:{x:{grid:{display:false}},y:{min:0,max:1,grid:{color:'rgba(255,255,255,.05)'}}},
+    plugins:{legend:{position:'bottom',labels:{boxWidth:8,padding:10,font:{size:9}}}}
+  }
+});
+
+/* Prompt radar */
+const clrs=['#00ff88','#00d4ff','#ffb340'];
+new Chart(document.getElementById('promptRadar'),{
+  type:'radar',
+  data:{
+    labels:['BLEU','ROUGE','LLM Judge','Score Final'],
+    datasets:pd.map((r,i)=>({
+      label:r.version_name,
+      data:[r.bleu_score,r.rouge_score,r.llm_judge_score,r.average_score],
+      backgroundColor:clrs[i%clrs.length]+'22',
+      borderColor:clrs[i%clrs.length],
+      borderWidth:1.5,pointRadius:3,
+    }))
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    scales:{r:{min:0,max:1,ticks:{stepSize:.25,backdropColor:'transparent'},grid:{color:'rgba(255,255,255,.06)'}}},
+    plugins:{legend:{position:'bottom',labels:{boxWidth:8,padding:8,font:{size:9}}}}
+  }
+});
+{% endif %}
+
+/* Model bar */
+{% if comparison.model_comparison.results %}
+const md={{ comparison.model_comparison.results|safe }};
+new Chart(document.getElementById('modelBar'),{
+  type:'bar',
+  data:{
+    labels:md.map(r=>r.version_name),
+    datasets:[
+      {label:'BLEU', data:md.map(r=>r.bleu_score), backgroundColor:'#00d4ff33',borderColor:'#00d4ff',borderWidth:1.5},
+      {label:'ROUGE',data:md.map(r=>r.rouge_score),backgroundColor:'#00ff8833',borderColor:'#00ff88',borderWidth:1.5},
+      {label:'Judge',data:md.map(r=>r.llm_judge_score),backgroundColor:'#ffb34033',borderColor:'#ffb340',borderWidth:1.5},
+      {label:'Final',data:md.map(r=>r.average_score),backgroundColor:'#a78bfa33',borderColor:'#a78bfa',borderWidth:1.5},
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    scales:{x:{grid:{display:false}},y:{min:0,max:1,grid:{color:'rgba(255,255,255,.05)'}}},
+    plugins:{legend:{position:'bottom',labels:{boxWidth:8,padding:10,font:{size:9}}}}
+  }
+});
+new Chart(document.getElementById('modelPolar'),{
+  type:'polarArea',
+  data:{
+    labels:md.map(r=>r.version_name),
+    datasets:[{
+      data:md.map(r=>r.average_score),
+      backgroundColor:['#00ff8844','#00d4ff44','#ffb34044'],
+      borderColor:['#00ff88','#00d4ff','#ffb340'],
+      borderWidth:1.5,
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    scales:{r:{min:0,max:1,ticks:{backdropColor:'transparent'},grid:{color:'rgba(255,255,255,.06)'}}},
+    plugins:{legend:{position:'bottom',labels:{boxWidth:8,padding:8,font:{size:9}}}}
+  }
+});
+{% endif %}
+
+/* Rapport général */
+{% if rapport.results %}
+const rr={{ rapport.results|safe }};
+const dsL=Object.keys(rr);
+const ss=new Set();dsL.forEach(d=>Object.keys(rr[d]).forEach(s=>ss.add(s)));
+const sols=[...ss];
+const pal=['#00ff88','#00d4ff','#ffb340','#ff4d6a','#a78bfa'];
+new Chart(document.getElementById('rapportChart'),{
+  type:'bar',
+  data:{
+    labels:dsL,
+    datasets:sols.map((s,i)=>({
+      label:s,
+      data:dsL.map(d=>rr[d][s]||0),
+      backgroundColor:pal[i%pal.length]+'44',
+      borderColor:pal[i%pal.length],
+      borderWidth:1.5,
+    }))
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    scales:{x:{grid:{display:false}},y:{min:0,max:1,grid:{color:'rgba(255,255,255,.05)'}}},
+    plugins:{legend:{position:'bottom',labels:{boxWidth:8,padding:10,font:{size:9}}}}
+  }
+});
+{% endif %}
+</script>
+{% endblock %}

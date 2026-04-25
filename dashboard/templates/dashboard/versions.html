@@ -1,0 +1,265 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Versions & Prompts — LLM Eval{% endblock %}
+{% block nav_versions %}active{% endblock %}
+{% block topbar_crumb %}versions-prompts{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-top">
+    <div>
+      <div class="page-title">Versions &amp; Prompts</div>
+      <div class="page-subtitle">Comparaison des versions de prompts et de modèles LLM</div>
+    </div>
+  </div>
+</div>
+
+{% if not comparison %}
+<div class="panel" style="text-align:center;padding:48px;color:var(--muted);font-family:var(--mono);font-size:11px">
+  comparison_results.json introuvable — lancer l'évaluation d'abord.
+</div>
+{% else %}
+
+<!-- ── Winners banner ── -->
+<div class="grid-2" style="margin-bottom:20px">
+  <div class="panel" style="background:rgba(255,179,64,.03);border-color:rgba(255,179,64,.2);display:flex;align-items:center;gap:16px">
+    <span style="font-size:28px">♛</span>
+    <div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px">Meilleur Prompt</div>
+      <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--amber)">{{ comparison.prompt_comparison.winner|default:"—" }}</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px">score {{ comparison.prompt_comparison.winner_score|default:"—" }}</div>
+    </div>
+  </div>
+  <div class="panel" style="background:rgba(0,212,255,.03);border-color:rgba(0,212,255,.2);display:flex;align-items:center;gap:16px">
+    <span style="font-size:28px">♛</span>
+    <div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px">Meilleur Modèle</div>
+      <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan)">{{ comparison.model_comparison.winner|default:"—" }}</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px">score {{ comparison.model_comparison.winner_score|default:"—" }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Classement Prompts ── -->
+{% if prompt_results %}
+<div class="section-hd">
+  <div class="section-hd-title">Classement Prompts</div>
+  <div class="section-hd-tag">{{ prompt_results|length }} versions testées</div>
+</div>
+<div class="grid-2" style="margin-bottom:4px">
+  <div class="chart-box">
+    <div class="chart-label">Score Final par version</div>
+    <div class="chart-wrap" style="height:220px">
+      <canvas id="promptFinalBar" role="img" aria-label="Score final de chaque version de prompt"></canvas>
+    </div>
+  </div>
+  <div class="chart-box">
+    <div class="chart-label">Radar multi-dimensions</div>
+    <div class="chart-wrap" style="height:220px">
+      <canvas id="promptRadar" role="img" aria-label="Comparaison radar BLEU ROUGE Judge par prompt"></canvas>
+    </div>
+  </div>
+</div>
+<div class="panel" style="padding:0;overflow:hidden;margin-bottom:20px">
+  <table class="data-table">
+    <thead><tr>
+      <th>Rang</th><th>Prompt</th><th>System Prompt</th>
+      <th>BLEU</th><th>ROUGE</th><th>Judge</th><th>Score</th><th>OK</th>
+    </tr></thead>
+    <tbody>
+      {% for r in prompt_results %}
+      <tr>
+        <td class="mono" style="text-align:center">
+          {% if forloop.counter == 1 %}<span class="medal-1" style="font-size:16px">①</span>
+          {% elif forloop.counter == 2 %}<span class="medal-2" style="font-size:16px">②</span>
+          {% else %}<span class="medal-3" style="font-size:16px">③</span>{% endif %}
+        </td>
+        <td style="font-size:10px;max-width:140px">
+          {% if r.version_name == comparison.prompt_comparison.winner %}<span style="color:var(--amber)">♛ </span>{% endif %}
+          <strong>{{ r.version_name }}</strong>
+        </td>
+        <td style="font-size:9px;color:var(--muted2);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.system_prompt|default:"—" }}</td>
+        <td class="mono">{{ r.bleu_score }}</td>
+        <td class="mono">{{ r.rouge_score }}</td>
+        <td class="mono">{{ r.llm_judge_score }}</td>
+        <td class="mono" style="font-weight:600;color:{% if r.version_name == comparison.prompt_comparison.winner %}var(--amber){% else %}var(--text){% endif %}">{{ r.average_score }}</td>
+        <td>
+          {% if r.passed_questions > 0 %}<span class="tag tag-green">{{ r.passed_questions }}/{{ r.total_questions }}</span>
+          {% else %}<span class="tag tag-red">0/{{ r.total_questions }}</span>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- ── Classement Modèles ── -->
+{% if model_results %}
+<div class="section-hd">
+  <div class="section-hd-title">Classement Modèles</div>
+  <div class="section-hd-tag">{{ model_results|length }} modèles testés</div>
+</div>
+<div class="grid-2" style="margin-bottom:4px">
+  <div class="chart-box">
+    <div class="chart-label">Scores empilés par modèle</div>
+    <div class="chart-wrap" style="height:220px">
+      <canvas id="modelGrouped" role="img" aria-label="Comparaison des scores BLEU ROUGE Judge par modèle LLM"></canvas>
+    </div>
+  </div>
+  <div class="chart-box">
+    <div class="chart-label">Score Final — Doughnut</div>
+    <div class="chart-wrap" style="height:220px">
+      <canvas id="modelDoughnut" role="img" aria-label="Score final de chaque modèle en vue doughnut"></canvas>
+    </div>
+  </div>
+</div>
+<div class="panel" style="padding:0;overflow:hidden;margin-bottom:20px">
+  <table class="data-table">
+    <thead><tr><th>Rang</th><th>Modèle</th><th>BLEU</th><th>ROUGE</th><th>LLM Judge</th><th>Score Final</th></tr></thead>
+    <tbody>
+      {% for r in model_results %}
+      <tr>
+        <td class="mono" style="text-align:center">
+          {% if forloop.counter == 1 %}<span class="medal-1" style="font-size:16px">①</span>
+          {% elif forloop.counter == 2 %}<span class="medal-2" style="font-size:16px">②</span>
+          {% else %}<span class="medal-3" style="font-size:16px">③</span>{% endif %}
+        </td>
+        <td style="font-weight:{% if r.version_name == comparison.model_comparison.winner %}500{% else %}400{% endif %}">
+          {% if r.version_name == comparison.model_comparison.winner %}<span style="color:var(--cyan)">♛ </span>{% endif %}{{ r.version_name }}
+        </td>
+        <td class="mono">{{ r.bleu_score }}</td>
+        <td class="mono">{{ r.rouge_score }}</td>
+        <td class="mono">{{ r.llm_judge_score }}</td>
+        <td class="mono" style="font-weight:600;color:{% if r.version_name == comparison.model_comparison.winner %}var(--cyan){% else %}var(--text){% endif %}">{{ r.average_score }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- ── Timeline évaluations ── -->
+<div class="section-hd"><div class="section-hd-title">Timeline des Évaluations</div></div>
+<div class="chart-box" style="margin-bottom:16px">
+  <div class="chart-label">Score Final dans le temps</div>
+  <div class="chart-wrap" style="height:180px">
+    <canvas id="timelineChart" role="img" aria-label="Évolution des scores dans le temps par évaluation"></canvas>
+  </div>
+</div>
+
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+{% if prompt_results %}
+const pd={{ prompt_results|safe }};
+const pal=['#00ff88','#00d4ff','#ffb340'];
+
+new Chart(document.getElementById('promptFinalBar'),{
+  type:'bar',
+  data:{
+    labels:pd.map(r=>r.version_name),
+    datasets:[{
+      label:'Score Final',
+      data:pd.map(r=>r.average_score),
+      backgroundColor:pd.map((_,i)=>pal[i%pal.length]+'55'),
+      borderColor:pd.map((_,i)=>pal[i%pal.length]),
+      borderWidth:2,
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    scales:{x:{grid:{display:false}},y:{min:0,max:1,grid:{color:'rgba(255,255,255,.05)'}}},
+    plugins:{legend:{display:false}}
+  }
+});
+
+new Chart(document.getElementById('promptRadar'),{
+  type:'radar',
+  data:{
+    labels:['BLEU','ROUGE','LLM Judge','Score Final'],
+    datasets:pd.map((r,i)=>({
+      label:r.version_name,
+      data:[r.bleu_score,r.rouge_score,r.llm_judge_score,r.average_score],
+      backgroundColor:pal[i%pal.length]+'22',
+      borderColor:pal[i%pal.length],
+      borderWidth:1.5,pointRadius:3,
+    }))
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    scales:{r:{min:0,max:1,ticks:{stepSize:.25,backdropColor:'transparent'},grid:{color:'rgba(255,255,255,.06)'}}},
+    plugins:{legend:{position:'bottom',labels:{boxWidth:8,padding:8,font:{size:9}}}}
+  }
+});
+{% endif %}
+
+{% if model_results %}
+const md={{ model_results|safe }};
+new Chart(document.getElementById('modelGrouped'),{
+  type:'bar',
+  data:{
+    labels:md.map(r=>r.version_name),
+    datasets:[
+      {label:'BLEU', data:md.map(r=>r.bleu_score), backgroundColor:'#00d4ff33',borderColor:'#00d4ff',borderWidth:1.5},
+      {label:'ROUGE',data:md.map(r=>r.rouge_score),backgroundColor:'#00ff8833',borderColor:'#00ff88',borderWidth:1.5},
+      {label:'Judge',data:md.map(r=>r.llm_judge_score),backgroundColor:'#ffb34033',borderColor:'#ffb340',borderWidth:1.5},
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    scales:{x:{grid:{display:false}},y:{min:0,max:1,grid:{color:'rgba(255,255,255,.05)'}}},
+    plugins:{legend:{position:'bottom',labels:{boxWidth:8,padding:8,font:{size:9}}}}
+  }
+});
+new Chart(document.getElementById('modelDoughnut'),{
+  type:'doughnut',
+  data:{
+    labels:md.map(r=>r.version_name),
+    datasets:[{
+      data:md.map(r=>r.average_score),
+      backgroundColor:['#00ff8844','#00d4ff44','#ffb34044'],
+      borderColor:['#00ff88','#00d4ff','#ffb340'],
+      borderWidth:2,hoverOffset:6,
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,cutout:'62%',
+    plugins:{
+      legend:{position:'bottom',labels:{boxWidth:8,padding:10,font:{size:9}}},
+      tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw}`}}
+    }
+  }
+});
+{% endif %}
+
+/* Timeline */
+const allEvals=[
+  {% if comparison.prompt_comparison.results %}{% for r in comparison.prompt_comparison.results %}{x:'{{ r.evaluated_at }}',y:{{ r.average_score }},lbl:'{{ r.version_name }}'},{% endfor %}{% endif %}
+  {% if comparison.model_comparison.results %}{% for r in comparison.model_comparison.results %}{x:'{{ r.evaluated_at }}',y:{{ r.average_score }},lbl:'{{ r.version_name }}'},{% endfor %}{% endif %}
+];
+if(allEvals.length>0){
+  new Chart(document.getElementById('timelineChart'),{
+    type:'scatter',
+    data:{datasets:[{
+      label:'Score par évaluation',
+      data:allEvals.map(e=>({x:e.x,y:e.y})),
+      backgroundColor:'#00ff8888',borderColor:'#00ff88',
+      pointRadius:7,pointHoverRadius:9,
+    }]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      scales:{
+        x:{type:'time',time:{unit:'minute',displayFormats:{minute:'HH:mm'}},grid:{color:'rgba(255,255,255,.04)'}},
+        y:{min:0,max:1,grid:{color:'rgba(255,255,255,.04)'}}
+      },
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>{const e=allEvals[ctx.dataIndex];return`${e.lbl}: ${e.y}`}}}
+      }
+    }
+  });
+}
+</script>
+{% endblock %}
