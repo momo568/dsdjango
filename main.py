@@ -57,7 +57,7 @@ def main():
     print("=" * 55)
 
     dataset     = load_dataset(args.dataset, limit=args.limit)
-    caller      = LLMCaller(model=args.model, use_rag=use_rag)
+    caller      = LLMCaller(model=args.model, use_rag=use_rag, dataset_path=args.dataset)
     llm_results = []
 
     for i, item in enumerate(dataset, 1):

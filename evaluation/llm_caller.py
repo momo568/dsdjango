@@ -10,7 +10,7 @@ import traceback
 from datetime import datetime
 class LLMCaller:
 
-    def __init__(self, model: str = "llama3.2:1b", use_rag: bool = True):
+    def __init__(self, model: str = "llama3.2:1b", use_rag: bool = True, dataset_path: str = "dataset.json"):
         self.model    = model
         self.use_rag  = use_rag
         self.rag      = None
@@ -18,7 +18,7 @@ class LLMCaller:
         # Charger le RAG si activé
         if self.use_rag:
             from evaluation.rag import RAGRetriever
-            self.rag = RAGRetriever(dataset_path="dataset.json", top_k=2)
+            self.rag = RAGRetriever(dataset_path=dataset_path, top_k=2)
             print(f"🔍 RAG activé → top_k=2")
         else:
             print(f"🔍 RAG désactivé")
