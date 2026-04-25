@@ -127,17 +127,33 @@ def comparaison_view(request):
     for i in range(1, 6):
         res = _load_json(f'results_solution{i}.json')
         if res:
-            solutions.append({
-                'id': i,
-                'name': f'Solution {i}',
-                'score': res.get('average_score', 0),
-                'metrics': [
+            if 'winner_score' in res and 'results' in res:
+                score = res.get('winner_score', 0)
+                winner = res.get('winner', '')
+                winner_data = next((r for r in res['results'] if r.get('prompt_name') == winner), {})
+                metrics = [
+                    winner_data.get('bleu_score', 0),
+                    winner_data.get('rouge_score', 0),
+                    winner_data.get('llm_judge_score', 0),
+                    winner_data.get('security_score', 0)
+                ]
+                decision = 'DEPLOY' if winner_data.get('passed') else 'BLOCK'
+            else:
+                score = res.get('average_score', 0)
+                metrics = [
                     res.get('bleu_score', 0),
                     res.get('rouge_score', 0),
                     res.get('llm_judge_score', 0),
                     res.get('security_score', 0)
-                ],
-                'decision': res.get('decision', 'N/A')
+                ]
+                decision = res.get('decision', 'N/A')
+
+            solutions.append({
+                'id': i,
+                'name': f'Solution {i}',
+                'score': score,
+                'metrics': metrics,
+                'decision': decision
             })
 
     return render(request, 'dashboard/comparaison.html', {
