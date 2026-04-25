@@ -16,8 +16,10 @@ class MetricsCalculator:
             prediction_tokens = prediction.lower().split()
             smoothing = SmoothingFunction().method1
             score = sentence_bleu([reference_tokens], prediction_tokens, smoothing_function=smoothing)
+            print("🟢 J'utilise NLTK pour le BLEU !")
             return round(score, 4)
         except ImportError:
+            print("🟠 NLTK non trouvé. J'utilise _simple_bleu !")
             return self._simple_bleu(prediction, reference)
 
     def _simple_bleu(self, prediction: str, reference: str) -> float:
@@ -33,8 +35,10 @@ class MetricsCalculator:
             from rouge_score import rouge_scorer
             scorer = rouge_scorer.RougeScorer(["rougeL"], use_stemmer=True)
             scores = scorer.score(reference, prediction)
+            print("🟢 J'utilise ROUGE-Score officiel !")
             return round(scores["rougeL"].fmeasure, 4)
         except ImportError:
+            print("🟠 Rouge-Score non trouvé. J'utilise _simple_rouge !")
             return self._simple_rouge(prediction, reference)
 
     def _simple_rouge(self, prediction: str, reference: str) -> float:
