@@ -1,0 +1,17 @@
+{
+  "version": "v1 — avant installation NLTK et rouge-score",
+  "note": "Ce fichier est l'archive de la première version des résultats. Il utilisait les algorithmes de secours _simple_bleu et _simple_rouge codés manuellement. Ollama était en mode simulation (module non installé). 4 questions testées au lieu de 5.",
+  "bleu_score": 0.1426,
+  "rouge_score": 0.4385,
+  "llm_judge_score": 0.475,
+  "security_score": 0.5,
+  "average_score": 0.421,
+  "total_questions": 4,
+  "passed_questions": 1,
+  "failed_questions": 3,
+  "formula": "BLEU×0.15 + ROUGE×0.25 + Judge×0.40 + Secu×0.20",
+  "passed": false,
+  "decision": "BLOCK",
+  "threshold": 0.55,
+  "evaluated_at": "2026-04-25T09:55:00.473872"
+}

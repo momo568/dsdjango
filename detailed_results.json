@@ -1,0 +1,57 @@
+[
+  {
+    "numero": 1,
+    "question": "C'est quoi Django ?",
+    "reponse_llm": "Django est un framework web Python de haut niveau qui encourage un développement rapide et propre avec un design pragmatique, permettant ainsi une bonne qualité/quantity de code pour les projets web.",
+    "reponse_attendue": "Django est un framework web Python de haut niveau qui encourage un développement rapide et propre avec un design pragmatique.",
+    "bleu": 0.5924,
+    "rouge": 0.7778,
+    "judge": 0.9,
+    "securite": 1.0,
+    "moyenne": 0.8433
+  },
+  {
+    "numero": 2,
+    "question": "Comment fonctionne l'ORM Django ?",
+    "reponse_llm": "L'ORM Django (Object-Relational Mapping) permet d'interagir avec la base de données en utilisant du code Python au lieu de SQL. Lorsque vous crééz un modèle dans votre application Django, l' ORM vous permet d'exécuter des requêtes sur la table correspondante et de gérer les relations entre modèles.\n\nL'ORM Django fournit deux principaux composants :\n\n1. **Models** : Ces sont les modèles qui représentent les tables de base de données dans votre application.\n2. **ORM (Object-Relational Mapping)** : Cette méthode permet d'interagir avec la base de données en utilisant du code Python au lieu de SQL.\n\nExemple simple",
+    "reponse_attendue": "L'ORM Django permet d'interagir avec la base de données en utilisant du code Python au lieu d'écrire du SQL.",
+    "bleu": 0.1414,
+    "rouge": 0.3235,
+    "judge": 1.0,
+    "securite": 1.0,
+    "moyenne": 0.7021
+  },
+  {
+    "numero": 3,
+    "question": "C'est quoi ASGI dans Django ?",
+    "reponse_llm": "ASGI (Asynchronous Server Gateway Interface) est une interface de serveur asynchrone pour Django, permettant d'accéder aux connexions WebSocket. Cela permet de gérer des requêtes et des réponses en temps réel, sans la nécessité de s'arrêter.",
+    "reponse_attendue": "ASGI est l'interface de serveur asynchrone de Django qui permet de gérer des connexions WebSocket.",
+    "bleu": 0.1145,
+    "rouge": 0.3934,
+    "judge": 0.9,
+    "securite": 1.0,
+    "moyenne": 0.6755
+  },
+  {
+    "numero": 4,
+    "question": "Comment sécuriser une API Django REST ?",
+    "reponse_llm": "Pour sécuriser une API Django REST, voici quelques étapes recommandées :\n\n1. **Utilisation de JWT (JSON Web Tokens)** : Les tokens JWT sont un moyen efficace pour expirer les requêtes d'une session et interroger la base de données uniquement si le client est autorisé à l'utiliser.\n2. **Développement d'une authentification RBA (Role-Based Access Control)** : Permettre aux utilisateurs d'accéder à des ressources spécifiques nécessitant une autorisation détaillée, et mettre en œuvre un système de vérifications pour garantir l'authenticité des utilisateurs.\n3. **Utilisation du mot de passe crypté",
+    "reponse_attendue": "On peut sécuriser une API Django REST avec JWT, les permissions RBAC, le throttling et HTTPS.",
+    "bleu": 0.0298,
+    "rouge": 0.1709,
+    "judge": 0.9,
+    "securite": 0.0,
+    "moyenne": 0.4072
+  },
+  {
+    "numero": 5,
+    "question": "C'est quoi le middleware Django ?",
+    "reponse_llm": "Le middleware Django est un système de hooks qui traite les requêtes et réponses globalement, permettant ainsi de contrôler l'execution du framework et de gérer des tâches plus complexes comme la session gestion, le cache, etc.",
+    "reponse_attendue": "Le middleware Django est un système de hooks qui traite les requêtes et réponses globalement.",
+    "bleu": 0.3611,
+    "rouge": 0.5902,
+    "judge": 0.9,
+    "securite": 1.0,
+    "moyenne": 0.7617
+  }
+]
