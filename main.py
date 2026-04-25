@@ -80,6 +80,25 @@ def main():
     # ── ÉTAPE 5 ─────────────────────────────────────────
     gate.export_results(gate_result, output_path=args.output)
 
+    # ── EXPORT DÉTAILLÉ (réponses textuelles de Mahmoud) ──
+    detailed_path = args.output.replace("eval_results.json", "detailed_results.json")
+    detailed_export = []
+    for i, item in enumerate(evaluated_results, 1):
+        detailed_export.append({
+            "numero":          i,
+            "question":        item.get("question", ""),
+            "reponse_llm":     item.get("answer", ""),
+            "reponse_attendue": item.get("expected_answer", ""),
+            "bleu":            item.get("bleu_score", 0),
+            "rouge":           item.get("rouge_score", 0),
+            "judge":           item.get("llm_judge_score", 0),
+            "securite":        item.get("security_score", 1),
+            "moyenne":         item.get("average_score", 0),
+        })
+    with open(detailed_path, "w", encoding="utf-8") as f:
+        json.dump(detailed_export, f, ensure_ascii=False, indent=2)
+    print(f"  📄 Réponses détaillées → {detailed_path}")
+
     # ── Résumé final ─────────────────────────────────────
     print(f"\n  🔍 Mode RAG    : {'Activé ✅' if use_rag else 'Désactivé ❌'}")
     print(f"  🎯 Décision    : {gate_result['decision']}")

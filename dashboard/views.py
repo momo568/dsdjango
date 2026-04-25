@@ -107,3 +107,42 @@ def api_summary(request):
         data['rapport_results'] = rapport['results']
     
     return JsonResponse(data)
+
+
+def comparaison_view(request):
+    """Vue Avant/Après — créée par Oumaima (Étudiant 2) pour montrer l'amélioration du pipeline."""
+    v1 = _load_json('eval_results_v1_before_nltk.json')  # Ancien (sans NLTK)
+    v2 = _load_json('eval_results.json')                 # Nouveau (avec NLTK)
+
+    metriques = [
+        {'nom': 'BLEU',      'avant': v1.get('bleu_score', 0),      'apres': v2.get('bleu_score', 0)},
+        {'nom': 'ROUGE',     'avant': v1.get('rouge_score', 0),     'apres': v2.get('rouge_score', 0)},
+        {'nom': 'LLM-Judge', 'avant': v1.get('llm_judge_score', 0), 'apres': v2.get('llm_judge_score', 0)},
+        {'nom': 'Sécurité',  'avant': v1.get('security_score', 0),  'apres': v2.get('security_score', 0)},
+        {'nom': 'Moyenne',   'avant': v1.get('average_score', 0),   'apres': v2.get('average_score', 0)},
+    ]
+
+    # Load the 5 solutions
+    solutions = []
+    for i in range(1, 6):
+        res = _load_json(f'results_solution{i}.json')
+        if res:
+            solutions.append({
+                'id': i,
+                'name': f'Solution {i}',
+                'score': res.get('average_score', 0),
+                'metrics': [
+                    res.get('bleu_score', 0),
+                    res.get('rouge_score', 0),
+                    res.get('llm_judge_score', 0),
+                    res.get('security_score', 0)
+                ],
+                'decision': res.get('decision', 'N/A')
+            })
+
+    return render(request, 'dashboard/comparaison.html', {
+        'v1': v1,
+        'v2': v2,
+        'metriques': metriques,
+        'solutions': solutions,
+    })

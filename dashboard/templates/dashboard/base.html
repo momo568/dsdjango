@@ -282,6 +282,19 @@ a{color:inherit;text-decoration:none}
       </svg>
       État Système
     </a>
+
+    <div class="sb-section" style="margin-top:8px;">Pipeline d'Évaluation</div>
+
+    <a href="{% url 'dashboard-comparaison' %}" class="nav-link {% block nav_comparaison %}{% endblock %}" style="color:#a78bfa;border-left-color:rgba(167,139,250,.3);"
+      onmouseover="this.style.background='rgba(167,139,250,.06)';this.style.borderLeftColor='#a78bfa'"
+      onmouseout="this.style.background='';this.style.borderLeftColor='rgba(167,139,250,.3)'">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" style="color:#a78bfa;opacity:1">
+        <rect x="1" y="8" width="4" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="6" y="4" width="4" height="11" rx="1" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="11" y="1" width="4" height="14" rx="1" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      Comparaison Avant/Après
+    </a>
   </nav>
 
   <div class="sb-footer">

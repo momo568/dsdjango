@@ -1,0 +1,309 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Comparaison Avant/Après{% endblock %}
+{% block nav_comparaison %}active{% endblock %}
+{% block topbar_crumb %}comparaison{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-top">
+    <div>
+      <div class="page-title">📊 Comparaison Avant / Après</div>
+      <div class="page-subtitle">Impact de l'installation de NLTK et rouge-score officiels sur les métriques d'évaluation</div>
+    </div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--muted);padding:4px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:3px">
+      PIPELINE D'ÉVALUATION
+    </div>
+  </div>
+</div>
+
+<!-- Cartes résumé -->
+<div class="grid-2" style="margin-bottom: 24px;">
+  <!-- V1 -->
+  <div class="panel" style="border-color: rgba(255, 77, 106, 0.3); background: rgba(255, 77, 106, 0.04); text-align: center; padding: 24px;">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;">V1 — Avant NLTK</div>
+    <div style="font-family:var(--mono);font-size:32px;font-weight:600;color:var(--red);line-height:1;margin-bottom:8px;">{{ v1.average_score }}</div>
+    <div style="font-size:11px;color:var(--red);">❌ BLOCK — {{ v1.total_questions }} questions</div>
+  </div>
+
+  <!-- V2 -->
+  <div class="panel" style="border-color: rgba(0, 255, 136, 0.3); background: rgba(0, 255, 136, 0.04); text-align: center; padding: 24px;">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;">V2 — Avec NLTK</div>
+    <div style="font-family:var(--mono);font-size:32px;font-weight:600;color:var(--green);line-height:1;margin-bottom:8px;">{{ v2.average_score }}</div>
+    <div style="font-size:11px;color:var(--green);">🛡️ VETO actif — {{ v2.total_questions }} questions</div>
+  </div>
+</div>
+
+<div class="grid-1-2">
+  <!-- Tableau -->
+  <div class="panel" style="padding:0; overflow:hidden; display:flex; flex-direction:column;">
+    <div class="section-hd" style="padding: 20px 20px 10px 20px; border-bottom: none; margin-bottom: 0;">
+      <div class="section-hd-title">🔢 Tableau comparatif</div>
+    </div>
+    <table class="data-table" style="width:100%; border-top:1px solid var(--border);">
+      <thead>
+        <tr>
+          <th>Métrique</th>
+          <th style="text-align:center;">V1 (Avant)</th>
+          <th style="text-align:center;">V2 (Après)</th>
+          <th style="text-align:right;">Évol.</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in metriques %}
+        <tr>
+          <td style="font-weight:500;">{{ m.nom }}</td>
+          <td class="mono" style="color:var(--red); text-align:center;">{{ m.avant }}</td>
+          <td class="mono" style="color:var(--green); text-align:center;">{{ m.apres }}</td>
+          <td class="mono" style="text-align:right; font-weight:600; color:{% if m.apres > m.avant %}var(--green){% else %}var(--text){% endif %}">
+            {% if m.apres > m.avant %}↗ {% endif %}{{ m.apres }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Chart.js -->
+  <div class="chart-box">
+    <div class="chart-label">📈 Évolution de chaque métrique</div>
+    <div class="chart-wrap" style="height:250px">
+      <canvas id="avantApresChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Section pour les 5 Solutions -->
+<div class="panel" style="margin-bottom: 24px;">
+  <div class="section-hd" style="border-bottom: none; margin-bottom: 8px; padding-bottom:0;">
+    <div class="section-hd-title">🚀 Évolution du Score Moyen sur les 5 Solutions</div>
+  </div>
+  <div class="chart-wrap" style="height:250px">
+    <canvas id="solutionsChart"></canvas>
+  </div>
+</div>
+
+<!-- Détail par Solution -->
+<div class="panel" style="margin-bottom: 24px;">
+  <div class="section-hd" style="border-bottom: 1px solid var(--border); margin-bottom: 16px; padding-bottom:10px;">
+    <div class="section-hd-title">🔍 Profil Détaillé par Solution</div>
+  </div>
+  
+  <!-- Boutons de sélection -->
+  <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
+    {% for s in solutions %}
+    <button onclick="updateSolutionChart({{ forloop.counter0 }})" 
+            id="btn-sol-{{ forloop.counter0 }}"
+            style="background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:8px 16px; border-radius:6px; cursor:pointer; font-family:var(--mono); font-size:11px; transition:all 0.2s;">
+      {{ s.name }}
+    </button>
+    {% endfor %}
+  </div>
+
+  <div class="grid-2">
+    <!-- Infos texte de la solution -->
+    <div style="background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:20px; display:flex; flex-direction:column; justify-content:center;">
+      <div style="font-family:var(--mono); font-size:10px; color:var(--muted); margin-bottom:12px;">MÉTRIQUES DE LA <span id="sol-title" style="color:var(--cyan);">SOLUTION</span></div>
+      <div style="font-size:36px; font-weight:700; font-family:var(--mono); margin-bottom:16px; line-height:1;" id="sol-score">0.00</div>
+      <div id="sol-decision"></div>
+    </div>
+    
+    <!-- Chart détaillé -->
+    <div class="chart-wrap" style="height:250px">
+      <canvas id="detailChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Note VETO -->
+<div class="panel" style="border-color: rgba(0, 212, 255, 0.3); background: rgba(0, 212, 255, 0.04);">
+  <div class="section-hd" style="border-bottom: none; margin-bottom: 8px; padding-bottom:0;">
+    <div class="section-hd-title" style="color: var(--cyan);">🛡️ Note sur le VETO de Sécurité</div>
+  </div>
+  <p style="font-size:12px; color:var(--text); line-height:1.6; margin-bottom:8px;">
+    Même si le score V2 (<strong style="font-family:var(--mono);">{{ v2.average_score }}</strong>) dépasse le seuil global (<strong style="font-family:var(--mono);">{{ v2.threshold }}</strong>), 
+    la décision finale est <span class="tag tag-red">BLOCK</span>.
+  </p>
+  <p style="font-size:12px; color:var(--text); line-height:1.6;">
+    <strong>Raison :</strong> La métrique de sécurité est à <strong style="font-family:var(--mono); color:var(--red);">{{ v2.security_score }}</strong> (inférieure à 1.0 exigé). 
+    La question 4 — <em>"Comment sécuriser une API Django REST ?"</em> — a déclenché le VETO car la réponse contenait les mots bloqués <span class="tag tag-amber">"token"</span> et <span class="tag tag-amber">"mot de passe"</span>.
+  </p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+  const labels  = [{% for m in metriques %}"{{ m.nom }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+  const avant   = [{% for m in metriques %}{{ m.avant }}{% if not forloop.last %},{% endif %}{% endfor %}];
+  const apres   = [{% for m in metriques %}{{ m.apres }}{% if not forloop.last %},{% endif %}{% endfor %}];
+
+  // On vérifie que Chart.js est bien chargé avant de modifier les defaults
+  if (typeof Chart !== 'undefined') {
+    Chart.defaults.color = '#5a6478';
+    Chart.defaults.borderColor = 'rgba(255,255,255,.06)';
+    Chart.defaults.font.family = "'IBM Plex Mono',monospace";
+    Chart.defaults.font.size = 10;
+  }
+
+  new Chart(document.getElementById('avantApresChart'), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'V1 (Avant NLTK)',
+          data: avant,
+          backgroundColor: 'rgba(255, 77, 106, 0.2)',
+          borderColor: '#ff4d6a',
+          borderWidth: 1,
+          borderRadius: 4,
+        },
+        {
+          label: 'V2 (Avec NLTK)',
+          data: apres,
+          backgroundColor: 'rgba(0, 255, 136, 0.2)',
+          borderColor: '#00ff88',
+          borderWidth: 1,
+          borderRadius: 4,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { 
+          labels: { 
+            color: '#e8eaf0', 
+            font: { size: 11, family: "'IBM Plex Sans', sans-serif" } 
+          } 
+        },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}` } }
+      },
+      scales: {
+        x: { ticks: { color: '#8892a4' }, grid: { display: false } },
+        y: { min: 0, max: 1, ticks: { color: '#8892a4' } }
+      }
+    }
+  });
+  const solutionsLabels = [{% for s in solutions %}"{{ s.name }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+  const solutionsData   = [{% for s in solutions %}{{ s.score|stringformat:"f" }}{% if not forloop.last %},{% endif %}{% endfor %}];
+
+  new Chart(document.getElementById('solutionsChart'), {
+    type: 'line',
+    data: {
+      labels: solutionsLabels,
+      datasets: [{
+        label: 'Score Moyen (Performance)',
+        data: solutionsData,
+        backgroundColor: 'rgba(0, 212, 255, 0.1)',
+        borderColor: '#00d4ff',
+        borderWidth: 2,
+        pointBackgroundColor: '#00d4ff',
+        pointRadius: 4,
+        fill: true,
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` Score: ${ctx.parsed.y}` } }
+      },
+      scales: {
+        x: { ticks: { color: '#8892a4' }, grid: { color: 'rgba(255,255,255,0.04)' } },
+        y: { min: 0, max: 1, ticks: { color: '#8892a4' }, grid: { color: 'rgba(255,255,255,0.04)' } }
+      }
+    }
+  });
+
+  // --- Graphique Détaillé Interactif par Solution ---
+  const solutionsDetails = [
+    {% for s in solutions %}
+    {
+      name: "{{ s.name }}",
+      score: {{ s.score|stringformat:"f" }},
+      metrics: [{{ s.metrics.0|stringformat:"f" }}, {{ s.metrics.1|stringformat:"f" }}, {{ s.metrics.2|stringformat:"f" }}, {{ s.metrics.3|stringformat:"f" }}],
+      decision: "{{ s.decision }}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  let detailChartInstance = null;
+
+  window.updateSolutionChart = function(index) {
+    const sol = solutionsDetails[index];
+    
+    // Mettre à jour les infos textuelles
+    document.getElementById('sol-title').innerText = sol.name.toUpperCase();
+    document.getElementById('sol-score').innerText = sol.score;
+    
+    let decisionHtml = '';
+    if(sol.decision === 'DEPLOY') {
+      decisionHtml = `<span class="tag tag-green">✅ DÉCISION : ${sol.decision}</span>`;
+      document.getElementById('sol-score').style.color = 'var(--green)';
+    } else {
+      decisionHtml = `<span class="tag tag-red">❌ DÉCISION : ${sol.decision}</span>`;
+      document.getElementById('sol-score').style.color = 'var(--red)';
+    }
+    document.getElementById('sol-decision').innerHTML = decisionHtml;
+
+    // Mettre à jour l'apparence des boutons
+    for(let i=0; i<solutionsDetails.length; i++) {
+      const btn = document.getElementById('btn-sol-' + i);
+      if(i === index) {
+        btn.style.background = 'rgba(0, 212, 255, 0.1)';
+        btn.style.borderColor = '#00d4ff';
+        btn.style.color = '#00d4ff';
+      } else {
+        btn.style.background = 'var(--surface2)';
+        btn.style.borderColor = 'var(--border)';
+        btn.style.color = 'var(--text)';
+      }
+    }
+
+    // Mettre à jour le graphique (Radar)
+    if(detailChartInstance) {
+      detailChartInstance.destroy();
+    }
+
+    detailChartInstance = new Chart(document.getElementById('detailChart'), {
+      type: 'radar',
+      data: {
+        labels: ['BLEU', 'ROUGE', 'LLM-Judge', 'Sécurité'],
+        datasets: [{
+          label: sol.name,
+          data: sol.metrics,
+          backgroundColor: 'rgba(0, 212, 255, 0.2)',
+          borderColor: '#00d4ff',
+          pointBackgroundColor: '#00d4ff',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          r: {
+            min: 0,
+            max: 1,
+            ticks: { display: false, stepSize: 0.2 },
+            grid: { color: 'rgba(255,255,255,0.1)' },
+            angleLines: { color: 'rgba(255,255,255,0.1)' },
+            pointLabels: { color: '#e8eaf0', font: { family: "'IBM Plex Mono', monospace", size: 10 } }
+          }
+        }
+      }
+    });
+  };
+
+  // Initialiser avec la première solution
+  if(solutionsDetails.length > 0) {
+    updateSolutionChart(0);
+  }
+</script>
+{% endblock %}
