@@ -147,7 +147,7 @@ def health_view(request):
         final_status = 'critical'
         reason = (
             f"Score offline insuffisant : {offline_score} < {RELEASE_GATE_THRESHOLD} "
-            f"(formule Student #2 : BLEU×0.2 + ROUGE×0.3 + Judge×0.5)"
+            f"(formule Student #2 : BLEU×0.15 + ROUGE×0.25 + Judge×0.40 + Secu×0.20)"
         )
     else:
         final_status = online_status

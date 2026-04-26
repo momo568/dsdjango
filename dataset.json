@@ -1,7 +1,267 @@
 [
-  {"id": 1, "question": "C'est quoi Django ?", "expected_answer": "Django est un framework web Python de haut niveau qui encourage un développement rapide et propre avec un design pragmatique."},
-  {"id": 2, "question": "Comment fonctionne l'ORM Django ?", "expected_answer": "L'ORM Django permet d'interagir avec la base de données en utilisant du code Python au lieu d'écrire du SQL."},
-  {"id": 3, "question": "C'est quoi ASGI dans Django ?", "expected_answer": "ASGI est l'interface de serveur asynchrone de Django qui permet de gérer des connexions WebSocket."},
-  {"id": 4, "question": "Comment sécuriser une API Django REST ?", "expected_answer": "On peut sécuriser une API Django REST avec JWT, les permissions RBAC, le throttling et HTTPS."},
-  {"id": 5, "question": "C'est quoi le middleware Django ?", "expected_answer": "Le middleware Django est un système de hooks qui traite les requêtes et réponses globalement."}
+  {
+    "id": 1,
+    "question": "C'est quoi Django ?",
+    "expected_answer": "Django est un framework web Python de haut niveau qui encourage un développement rapide et propre avec un design pragmatique."
+  },
+  {
+    "id": 2,
+    "question": "Comment fonctionne l'ORM Django ?",
+    "expected_answer": "L'ORM Django permet d'interagir avec la base de données en utilisant du code Python au lieu d'écrire du SQL."
+  },
+  {
+    "id": 3,
+    "question": "C'est quoi ASGI dans Django ?",
+    "expected_answer": "ASGI est l'interface de serveur asynchrone de Django qui permet de gérer des connexions WebSocket."
+  },
+  {
+    "id": 4,
+    "question": "Comment sécuriser une API Django REST ?",
+    "expected_answer": "On peut sécuriser une API Django REST avec JWT, les permissions RBAC, le throttling et HTTPS."
+  },
+  {
+    "id": 5,
+    "question": "C'est quoi le middleware Django ?",
+    "expected_answer": "Le middleware Django est un système de hooks qui traite les requêtes et réponses globalement."
+  },
+  {
+    "id": 6,
+    "question": "Quelle est la recette de la pizza margherita ?",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 7,
+    "question": "Comment réparer le moteur d'une voiture Peugeot ?",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 8,
+    "question": "Qui a gagné la coupe du monde en 1998 ?",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 9,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 10,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 11,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 12,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 13,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 14,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 15,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 16,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 17,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 18,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 19,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 20,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 21,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 22,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 23,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 24,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 25,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 26,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 27,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 28,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 29,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 30,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 31,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 32,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 33,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 34,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 35,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 36,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 37,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 38,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 39,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 40,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 41,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 42,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 43,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 44,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 45,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 46,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 47,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 48,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 49,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 50,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 51,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 52,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  },
+  {
+    "id": 53,
+    "question": "Question hors-sujet interceptée en production",
+    "expected_answer": "Désolé, je suis un assistant spécialisé dans l'absentéisme scolaire, je ne peux pas répondre à cette question."
+  }
 ]

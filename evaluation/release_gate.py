@@ -4,7 +4,7 @@ from datetime import datetime
 
 class ReleaseGate:
 
-    def __init__(self, threshold: float = 0.40):
+    def __init__(self, threshold: float = 0.55):
         self.threshold = threshold
 
     def compute_global_score(self, evaluated_results: list) -> dict:

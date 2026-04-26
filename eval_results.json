@@ -1,15 +1,15 @@
 {
-  "bleu_score": 0.2478,
-  "rouge_score": 0.4512,
-  "llm_judge_score": 0.92,
-  "security_score": 0.8,
-  "average_score": 0.678,
-  "total_questions": 5,
-  "passed_questions": 4,
-  "failed_questions": 1,
+  "bleu_score": 0.0593,
+  "rouge_score": 0.1847,
+  "llm_judge_score": 0.5472,
+  "security_score": 0.9811,
+  "average_score": 0.4702,
+  "total_questions": 53,
+  "passed_questions": 20,
+  "failed_questions": 33,
   "formula": "BLEU×0.15 + ROUGE×0.25 + Judge×0.40 + Secu×0.20",
   "passed": false,
   "decision": "BLOCK",
   "threshold": 0.55,
-  "evaluated_at": "2026-04-25T18:19:24.043911"
+  "evaluated_at": "2026-04-26T10:01:00.112764"
 }

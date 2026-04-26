@@ -1,0 +1,317 @@
+[
+    {
+        "recorded_at": "2026-04-26T08:53:24.504675+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 992.3,
+        "drift_score": 0.4696,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:52:24.504675+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 973.18,
+        "drift_score": 0.472,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:51:24.504675+00:00",
+        "path": "/api/llm/chat/",
+        "latency_ms": 908.09,
+        "drift_score": 0.4555,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:50:24.504675+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 988.78,
+        "drift_score": 0.5298,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:49:24.504675+00:00",
+        "path": "/api/llm/summarize/",
+        "latency_ms": 808.52,
+        "drift_score": 0.6206,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:48:24.504675+00:00",
+        "path": "/api/llm/chat/",
+        "latency_ms": 1018.48,
+        "drift_score": 0.536,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:47:24.504675+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 738.24,
+        "drift_score": 0.4997,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:46:24.504675+00:00",
+        "path": "/api/llm/summarize/",
+        "latency_ms": 562.4,
+        "drift_score": 0.5091,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:45:24.504675+00:00",
+        "path": "/api/llm/summarize/",
+        "latency_ms": 539.32,
+        "drift_score": 0.3676,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:44:24.504675+00:00",
+        "path": "/api/llm/summarize/",
+        "latency_ms": 829.02,
+        "drift_score": 0.62,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:43:24.504675+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 477.73,
+        "drift_score": 0.4748,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:42:24.504675+00:00",
+        "path": "/api/llm/chat/",
+        "latency_ms": 927.83,
+        "drift_score": 0.5116,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:41:24.504675+00:00",
+        "path": "/api/llm/summarize/",
+        "latency_ms": 702.85,
+        "drift_score": 0.5158,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:40:24.504675+00:00",
+        "path": "/api/llm/chat/",
+        "latency_ms": 535.52,
+        "drift_score": 0.6226,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:39:24.504675+00:00",
+        "path": "/api/llm/chat/",
+        "latency_ms": 433.32,
+        "drift_score": 0.5261,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:37:04.979390+00:00",
+        "path": "/api/llm/chat/",
+        "latency_ms": 1045.52,
+        "drift_score": 0.5837,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:36:04.979390+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 926.73,
+        "drift_score": 0.4113,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:35:04.979390+00:00",
+        "path": "/api/llm/chat/",
+        "latency_ms": 986.84,
+        "drift_score": 0.5319,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:34:04.979390+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 716.21,
+        "drift_score": 0.4058,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:33:04.979390+00:00",
+        "path": "/api/llm/chat/",
+        "latency_ms": 881.57,
+        "drift_score": 0.6147,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:32:04.979390+00:00",
+        "path": "/api/llm/summarize/",
+        "latency_ms": 972.21,
+        "drift_score": 0.5176,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:31:04.979390+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 1083.12,
+        "drift_score": 0.5246,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:30:04.979390+00:00",
+        "path": "/api/llm/chat/",
+        "latency_ms": 1053.36,
+        "drift_score": 0.6161,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:29:04.979390+00:00",
+        "path": "/api/llm/summarize/",
+        "latency_ms": 1024.6,
+        "drift_score": 0.4149,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:28:04.979390+00:00",
+        "path": "/api/llm/chat/",
+        "latency_ms": 1047.82,
+        "drift_score": 0.3638,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:27:04.979390+00:00",
+        "path": "/api/llm/summarize/",
+        "latency_ms": 1188.04,
+        "drift_score": 0.4214,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:26:04.979390+00:00",
+        "path": "/api/llm/chat/",
+        "latency_ms": 793.44,
+        "drift_score": 0.3643,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:25:04.979390+00:00",
+        "path": "/api/llm/summarize/",
+        "latency_ms": 897.55,
+        "drift_score": 0.5744,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:24:04.979390+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 1077.33,
+        "drift_score": 0.4276,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:23:04.979390+00:00",
+        "path": "/api/llm/summarize/",
+        "latency_ms": 781.4,
+        "drift_score": 0.6023,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:22:04.979390+00:00",
+        "path": "/api/llm/chat/",
+        "latency_ms": 914.04,
+        "drift_score": 0.3585,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:21:04.979390+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 1009.16,
+        "drift_score": 0.3553,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:20:04.979390+00:00",
+        "path": "/api/llm/chat/",
+        "latency_ms": 965.3,
+        "drift_score": 0.5412,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:19:04.979390+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 1048.14,
+        "drift_score": 0.5685,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:18:04.979390+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 924.26,
+        "drift_score": 0.3843,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:17:04.979390+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 1029.52,
+        "drift_score": 0.5394,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:16:04.979390+00:00",
+        "path": "/api/llm/summarize/",
+        "latency_ms": 1203.77,
+        "drift_score": 0.6442,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:15:04.979390+00:00",
+        "path": "/api/llm/summarize/",
+        "latency_ms": 963.15,
+        "drift_score": 0.5741,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:14:04.979390+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 890.96,
+        "drift_score": 0.5459,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:13:04.979390+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 1005.59,
+        "drift_score": 0.5833,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:12:04.979390+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 931.81,
+        "drift_score": 0.5724,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:11:04.979390+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 1121.72,
+        "drift_score": 0.5795,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:10:04.979390+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 683.5,
+        "drift_score": 0.6408,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:09:04.979390+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 684.3,
+        "drift_score": 0.403,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    },
+    {
+        "recorded_at": "2026-04-26T08:08:04.979390+00:00",
+        "path": "/api/infer/",
+        "latency_ms": 906.86,
+        "drift_score": 0.5309,
+        "prompt_a_traiter": "Question hors-sujet interceptée en production"
+    }
+]

@@ -7,11 +7,12 @@ et le système d'alertes (Student #5).
 """
 
 from django.db import models
+from django.utils import timezone
 
 
 class InferenceMetric(models.Model):
 
-    recorded_at       = models.DateTimeField(auto_now_add=True, db_index=True)
+    recorded_at       = models.DateTimeField(default=timezone.now, db_index=True)
     path              = models.CharField(max_length=255, db_index=True)
     method            = models.CharField(max_length=10, default='POST')
     status_code       = models.PositiveSmallIntegerField(default=200)
