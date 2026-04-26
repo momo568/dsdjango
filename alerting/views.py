@@ -1,5 +1,5 @@
 """
-Vues API pour l'alerting.
+Student #5 — Vues API pour l'alerting + démo.
 """
 
 from datetime import timedelta
@@ -29,7 +29,7 @@ def _auth(view_fn):
 
 
 # ─────────────────────────────────────────────────────────────────────
-# GET /api/alerts/?hours=24&severity=critical
+# GET /api/alerts/
 # ─────────────────────────────────────────────────────────────────────
 
 @_auth
@@ -64,10 +64,6 @@ def alerts_list(request):
     return JsonResponse({'count': len(rows), 'window_hours': hours, 'alerts': rows})
 
 
-# ─────────────────────────────────────────────────────────────────────
-# POST /api/alerts/<id>/ack/
-# ─────────────────────────────────────────────────────────────────────
-
 @csrf_exempt
 @_auth
 @require_http_methods(['POST'])
@@ -78,10 +74,6 @@ def alert_ack(request, pk: int):
     alert.save(update_fields=['acknowledged', 'resolved_at'])
     return JsonResponse({'status': 'ok', 'id': alert.id, 'acknowledged': True})
 
-
-# ─────────────────────────────────────────────────────────────────────
-# GET /api/alerts/releases/?days=30
-# ─────────────────────────────────────────────────────────────────────
 
 @_auth
 def releases_list(request):
@@ -109,8 +101,77 @@ def releases_list(request):
 
 
 # ─────────────────────────────────────────────────────────────────────
-# helper
+# DEMO ENDPOINTS — pour la soutenance (boutons sur le dashboard)
 # ─────────────────────────────────────────────────────────────────────
+
+@csrf_exempt
+@_auth
+@require_http_methods(['POST'])
+def demo_release_gate(request):
+    """Déclenche une release gate de démo."""
+    from .release import ReleaseService
+    import random
+    version = f"v{random.randint(1,9)}.{random.randint(0,9)}-demo"
+    sha = ''.join(random.choices('abcdef0123456789', k=7))
+    event = ReleaseService().decide(
+        version=version, git_sha=sha, triggered_by='demo'
+    )
+    return JsonResponse({
+        'status':   'ok',
+        'event':    event.event,
+        'version':  event.version,
+        'score':    event.offline_score,
+        'message':  f"Release Gate exécutée : {event.event.upper()}",
+    })
+
+
+@csrf_exempt
+@_auth
+@require_http_methods(['POST'])
+def demo_rollback(request):
+    """Déclenche un rollback de démo (en mode dry-run)."""
+    from .release import ReleaseService
+    event = ReleaseService().rollback(
+        reason="Démo soutenance — rollback simulé",
+        triggered_by='demo',
+        dry_run=True,
+    )
+    return JsonResponse({
+        'status':   'ok',
+        'success':  event.success,
+        'version':  event.version,
+        'message':  f"Rollback {'réussi' if event.success else 'échoué'}",
+    })
+
+
+@csrf_exempt
+@_auth
+@require_http_methods(['POST'])
+def demo_run_alerts(request):
+    """Lance le moteur d'alertes de démo."""
+    from .engine import AlertEngine
+    alerts = AlertEngine().run(window_minutes=5)
+    return JsonResponse({
+        'status':   'ok',
+        'count':    len(alerts),
+        'message':  f"{len(alerts)} alerte(s) déclenchée(s)",
+    })
+
+
+@csrf_exempt
+@_auth
+@require_http_methods(['POST'])
+def demo_reset(request):
+    """Vide toutes les alertes et release events (pour démo propre)."""
+    a_count = Alert.objects.count()
+    r_count = ReleaseEvent.objects.count()
+    Alert.objects.all().delete()
+    ReleaseEvent.objects.all().delete()
+    return JsonResponse({
+        'status':  'ok',
+        'message': f"{a_count} alertes et {r_count} releases supprimées",
+    })
+
 
 def _parse_int(value, default, lo, hi):
     try:

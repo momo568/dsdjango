@@ -6,7 +6,7 @@
 <div class="content-wrap" style="padding:32px;">
 
   <!-- Header -->
-  <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px;">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:16px;">
     <div>
       <div style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">
         Student #5 · Monitoring Online Partie 2 + Release
@@ -17,10 +17,31 @@
       </h1>
     </div>
     <div style="display:flex;gap:8px;">
-      <button onclick="loadData()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:8px 14px;border-radius:var(--r);cursor:pointer;letter-spacing:.05em;">
-        ↻ Rafraîchir
+      <button onclick="loadData()" class="btn-demo" style="background:var(--surface2);">↻ Rafraîchir</button>
+    </div>
+  </div>
+
+  <!-- DEMO PANEL — boutons pour la soutenance -->
+  <div class="demo-panel">
+    <div class="demo-panel-title">
+      <span style="color:var(--amber);">⚡</span> Démo live
+      <span style="font-size:10px;color:var(--muted);font-weight:400;margin-left:8px;">— cliquez pour déclencher les actions</span>
+    </div>
+    <div class="demo-buttons">
+      <button onclick="demoReleaseGate()" class="btn-demo btn-amber">
+        🚦 Tester Release Gate
+      </button>
+      <button onclick="demoRollback()" class="btn-demo btn-cyan">
+        🔁 Simuler Rollback
+      </button>
+      <button onclick="demoRunAlerts()" class="btn-demo btn-red">
+        🔔 Évaluer Alertes
+      </button>
+      <button onclick="demoReset()" class="btn-demo btn-muted">
+        🗑️ Réinitialiser
       </button>
     </div>
+    <div id="demo-status" class="demo-status"></div>
   </div>
 
   <!-- KPI cards -->
@@ -86,10 +107,47 @@
 </div>
 
 <style>
+  /* DEMO PANEL */
+  .demo-panel{
+    background:linear-gradient(135deg, rgba(255,179,64,.04), rgba(0,212,255,.03));
+    border:1px solid rgba(255,179,64,.15);
+    border-radius:var(--r);
+    padding:16px 18px;margin-bottom:24px;
+  }
+  .demo-panel-title{
+    font-family:var(--mono);font-size:11px;font-weight:500;
+    letter-spacing:.05em;text-transform:uppercase;
+    color:var(--text);margin-bottom:12px;
+  }
+  .demo-buttons{display:flex;gap:8px;flex-wrap:wrap;}
+  .btn-demo{
+    background:var(--surface2);border:1px solid var(--border2);
+    color:var(--text);font-family:var(--mono);font-size:11px;
+    padding:8px 14px;border-radius:var(--r);cursor:pointer;
+    letter-spacing:.05em;transition:all .15s ease;
+  }
+  .btn-demo:hover{transform:translateY(-1px);}
+  .btn-demo:active{transform:translateY(0);}
+  .btn-amber{border-color:rgba(255,179,64,.4);color:var(--amber);}
+  .btn-amber:hover{background:rgba(255,179,64,.1);}
+  .btn-cyan{border-color:rgba(0,212,255,.4);color:var(--cyan);}
+  .btn-cyan:hover{background:rgba(0,212,255,.1);}
+  .btn-red{border-color:rgba(255,77,106,.4);color:var(--red);}
+  .btn-red:hover{background:rgba(255,77,106,.1);}
+  .btn-muted{border-color:var(--border2);color:var(--muted2);}
+  .btn-muted:hover{background:rgba(255,255,255,.03);}
+  .demo-status{
+    margin-top:12px;font-family:var(--mono);font-size:11px;
+    color:var(--green);min-height:14px;
+  }
+  .demo-status.error{color:var(--red);}
+
+  /* KPI cards */
   .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;}
   .kpi-label{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
   .kpi-value{font-family:var(--mono);font-size:28px;font-weight:500;letter-spacing:-.02em;}
 
+  /* Panels */
   .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
   .panel-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
   .panel-title{font-size:12px;font-weight:500;letter-spacing:.04em;}
@@ -97,6 +155,7 @@
 
   .filter-select{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:10px;padding:5px 8px;border-radius:4px;}
 
+  /* Alert rows */
   .alert-row{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start;}
   .alert-row:hover{background:rgba(255,255,255,.02);}
   .alert-row:last-child{border-bottom:none;}
@@ -109,6 +168,7 @@
   .alert-meta{font-family:var(--mono);font-size:10px;color:var(--muted);}
   .alert-message{font-size:11px;color:var(--muted2);margin-top:6px;line-height:1.5;}
 
+  /* Release rows */
   .release-row{padding:11px 18px;border-bottom:1px solid var(--border);}
   .release-row:last-child{border-bottom:none;}
   .release-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
@@ -183,7 +243,7 @@ async function loadReleases(){
     const list = document.getElementById('releases-list');
 
     if(!data.releases.length){
-      list.innerHTML = '<div class="empty-state">Aucune release enregistrée.<br><span style="font-size:10px;">Lance: <code style="color:var(--cyan);">python manage.py release_gate</code></span></div>';
+      list.innerHTML = '<div class="empty-state">Aucune release enregistrée.<br><span style="font-size:10px;">Cliquez sur les boutons de démo pour déclencher des événements.</span></div>';
       return;
     }
 
@@ -223,6 +283,42 @@ function loadData(){
   loadAlerts();
   loadReleases();
   loadKPIs();
+}
+
+// ─── DEMO BUTTONS ───
+async function demoAction(url, label){
+  const status = document.getElementById('demo-status');
+  status.classList.remove('error');
+  status.textContent = `⏳ ${label} en cours...`;
+  try {
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: {'X-Monitor-Api-Key': API_KEY},
+    });
+    const data = await r.json();
+    if(r.ok){
+      status.textContent = `✅ ${data.message}`;
+      // Auto-refresh après 500ms pour voir le résultat
+      setTimeout(loadData, 500);
+    } else {
+      status.classList.add('error');
+      status.textContent = `❌ ${data.error || 'Erreur'}`;
+    }
+  } catch(e){
+    status.classList.add('error');
+    status.textContent = `❌ ${e.message}`;
+  }
+  // Efface le message après 5s
+  setTimeout(() => { status.textContent = ''; }, 5000);
+}
+
+function demoReleaseGate(){ demoAction('/api/alerts/demo/release-gate/', 'Release Gate'); }
+function demoRollback()   { demoAction('/api/alerts/demo/rollback/',     'Rollback'); }
+function demoRunAlerts()  { demoAction('/api/alerts/demo/run-alerts/',   'Évaluation alertes'); }
+function demoReset()      {
+  if(confirm('Vider toutes les alertes et release events ?')){
+    demoAction('/api/alerts/demo/reset/', 'Réinitialisation');
+  }
 }
 
 loadData();
