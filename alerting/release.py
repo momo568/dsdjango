@@ -31,7 +31,7 @@ EVAL_RESULTS_PATH: Path = getattr(
     settings, 'LLM_EVAL_RESULTS_PATH', Path('eval_results.json')
 )
 RELEASE_THRESHOLD: float = getattr(
-    settings, 'LLM_RELEASE_GATE_THRESHOLD', 0.40
+    settings, 'LLM_RELEASE_GATE_THRESHOLD', 0.55
 )
 ROLLBACK_SCRIPT: Path = getattr(
     settings, 'ROLLBACK_SCRIPT_PATH', Path(settings.BASE_DIR) / 'scripts' / 'rollback.sh'

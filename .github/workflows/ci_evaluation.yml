@@ -33,7 +33,7 @@ jobs:
           # Lance le pipeline principal d'évaluation des métriques (BLEU/ROUGE/LLM-Judge)
           # Noter qu'Ollama n'étant pas disponible par défaut dans le CI, 
           # le script retombera intelligemment sur la simulation grâce à votre implémentation.
-          python main.py --dataset dataset.json --output eval_results.json --threshold 0.40
+          python main.py --dataset dataset.json --output eval_results.json --threshold 0.55
 
       - name: Parse Results
         id: parse_results

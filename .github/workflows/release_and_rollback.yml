@@ -53,10 +53,12 @@ jobs:
           pip install django
 
       - name: Run evaluation pipeline
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        # Note : Ce projet utilise Ollama (LLM local, modèle llama3.2:1b) et non OpenAI.
+        # En environnement CI (GitHub Actions), Ollama n'est pas disponible.
+        # Le script main.py détecte automatiquement l'absence d'Ollama
+        # et bascule en mode simulation pour calculer BLEU/ROUGE/Judge.
         run: |
-          python main.py --dataset dataset.json --output eval_results.json --threshold 0.40 || true
+          python main.py --dataset dataset.json --output eval_results.json --threshold 0.55 || true
           ls -la eval_results.json
 
       - name: Parse results
@@ -143,7 +145,7 @@ jobs:
           SCORE:  ${{ needs.evaluate.outputs.score }}
         run: |
           curl -X POST -H 'Content-Type: application/json' \
-            --data "{\"text\": \"🚨 *Release BLOQUÉE* sur ${GITHUB_REPOSITORY}@${GITHUB_SHA::7}\nScore offline: ${SCORE} < seuil 0.40\nVoir: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\"}" \
+            --data "{\"text\": \"🚨 *Release BLOQUÉE* sur ${GITHUB_REPOSITORY}@${GITHUB_SHA::7}\nScore offline: ${SCORE} < seuil 0.55\nVoir: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\"}" \
             "$SLACK_WEBHOOK_URL"
 
   # ───────────────────────────────────────────────────────────────────
