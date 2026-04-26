@@ -1,0 +1,254 @@
+name: Release Gate & Auto-Rollback (Student #5)
+
+# ─────────────────────────────────────────────────────────────────────
+# Pipeline complet de Release :
+#   1. Tourne l'évaluation offline (Student #2)
+#   2. Évalue la release gate via `manage.py release_gate`
+#   3. Si BLOQUÉE → échec du workflow + alerte Slack
+#   4. Si DEPLOY → déploiement (placeholder à adapter)
+#   5. Health-check post-déploiement
+#   6. Si santé critique → rollback automatique
+# ─────────────────────────────────────────────────────────────────────
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Forcer le deploy même si gate fail (debug only)'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write   # nécessaire pour le rollback (revert + push)
+  pull-requests: write
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # ───────────────────────────────────────────────────────────────────
+  # Job 1 — Évaluation offline (lance pipeline Student #2)
+  # ───────────────────────────────────────────────────────────────────
+  evaluate:
+    name: 📊 Évaluation offline (BLEU/ROUGE/Judge)
+    runs-on: ubuntu-latest
+    outputs:
+      score:  ${{ steps.parse.outputs.score }}
+      passed: ${{ steps.parse.outputs.passed }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install deps
+        run: |
+          pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install django
+
+      - name: Run evaluation pipeline
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python main.py --dataset dataset.json --output eval_results.json --threshold 0.40 || true
+          ls -la eval_results.json
+
+      - name: Parse results
+        id: parse
+        run: |
+          if [ -f eval_results.json ]; then
+            score=$(python -c "import json; print(json.load(open('eval_results.json')).get('average_score', 0))")
+            passed=$(python -c "import json; print(str(json.load(open('eval_results.json')).get('passed', False)).lower())")
+          else
+            score=0
+            passed=false
+          fi
+          echo "score=$score"   >> $GITHUB_OUTPUT
+          echo "passed=$passed" >> $GITHUB_OUTPUT
+          echo "📊 Score: $score | Passed: $passed"
+
+      - name: Upload eval_results.json
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results
+          path: eval_results.json
+
+  # ───────────────────────────────────────────────────────────────────
+  # Job 2 — Release Gate (la décision officielle)
+  # ───────────────────────────────────────────────────────────────────
+  release-gate:
+    name: 🚦 Release Gate
+    runs-on: ubuntu-latest
+    needs: evaluate
+    outputs:
+      decision: ${{ steps.gate.outputs.decision }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install deps
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install django
+
+      - name: Download eval results
+        uses: actions/download-artifact@v4
+        with:
+          name: eval-results
+
+      - name: Run migrations (sqlite éphémère)
+        run: |
+          python manage.py migrate --noinput
+
+      - name: Decide DEPLOY / BLOCK
+        id: gate
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          set +e
+          python manage.py release_gate \
+            --release-version "${GITHUB_REF_NAME}-${GITHUB_SHA::7}" \
+            --git-sha "${GITHUB_SHA}" \
+            --triggered-by "ci"
+          rc=$?
+          set -e
+          if [ $rc -eq 0 ]; then
+            echo "decision=DEPLOY" >> $GITHUB_OUTPUT
+          else
+            echo "decision=BLOCK" >> $GITHUB_OUTPUT
+            if [ "${{ inputs.force_deploy }}" != "true" ]; then
+              echo "❌ Release bloquée — score insuffisant."
+              exit 1
+            else
+              echo "⚠️ Release forcée par workflow_dispatch."
+            fi
+          fi
+
+      - name: Notify Slack on BLOCK
+        if: failure() && env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SCORE:  ${{ needs.evaluate.outputs.score }}
+        run: |
+          curl -X POST -H 'Content-Type: application/json' \
+            --data "{\"text\": \"🚨 *Release BLOQUÉE* sur ${GITHUB_REPOSITORY}@${GITHUB_SHA::7}\nScore offline: ${SCORE} < seuil 0.40\nVoir: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\"}" \
+            "$SLACK_WEBHOOK_URL"
+
+  # ───────────────────────────────────────────────────────────────────
+  # Job 3 — Déploiement (placeholder à adapter selon plateforme)
+  # ───────────────────────────────────────────────────────────────────
+  deploy:
+    name: 🚀 Deploy
+    runs-on: ubuntu-latest
+    needs: release-gate
+    if: needs.release-gate.outputs.decision == 'DEPLOY'
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy step (à adapter)
+        run: |
+          echo "✅ Déploiement vers production..."
+          echo "Commit déployé : $GITHUB_SHA"
+          # TODO: Heroku / k8s / Render / SSH...
+          # Exemples :
+          # - heroku container:release web -a $HEROKU_APP
+          # - kubectl set image deployment/api api=$IMAGE_TAG
+          # - ssh prod "cd /app && git pull && systemctl restart django"
+
+      - name: Reset drift detector after release
+        if: env.MONITOR_API_URL != ''
+        env:
+          MONITOR_API_URL: ${{ secrets.MONITOR_API_URL }}
+          MONITOR_API_KEY: ${{ secrets.MONITOR_API_KEY }}
+        run: |
+          curl -X POST -H "X-Monitor-Api-Key: $MONITOR_API_KEY" \
+            "$MONITOR_API_URL/api/monitor/drift/reset/" || true
+
+  # ───────────────────────────────────────────────────────────────────
+  # Job 4 — Health-check post-deploy + auto-rollback
+  # ───────────────────────────────────────────────────────────────────
+  post-deploy-check:
+    name: 🩺 Health-check post-deploy
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: needs.deploy.result == 'success'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wait for deploy to settle
+        run: sleep 60
+
+      - name: Probe /api/monitor/health/
+        id: health
+        env:
+          MONITOR_API_URL: ${{ secrets.MONITOR_API_URL }}
+          MONITOR_API_KEY: ${{ secrets.MONITOR_API_KEY }}
+        run: |
+          if [ -z "${MONITOR_API_URL:-}" ]; then
+            echo "⚠️ MONITOR_API_URL non configuré — skip health-check."
+            echo "status=skipped" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          set +e
+          response=$(curl -sS -o response.json -w "%{http_code}" \
+            -H "X-Monitor-Api-Key: $MONITOR_API_KEY" \
+            "$MONITOR_API_URL/api/monitor/health/")
+          set -e
+          echo "HTTP $response"
+          cat response.json || true
+          if [ "$response" = "200" ]; then
+            echo "status=healthy" >> $GITHUB_OUTPUT
+          else
+            echo "status=critical" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Trigger auto-rollback if critical
+        if: steps.health.outputs.status == 'critical'
+        run: |
+          echo "🚨 Santé critique post-déploiement — déclenchement du rollback."
+          chmod +x scripts/rollback.sh
+          ROLLBACK_PUSH=1 ./scripts/rollback.sh HEAD~1
+          # Notif Slack
+          if [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
+            curl -X POST -H 'Content-Type: application/json' \
+              --data "{\"text\": \"🔁 *AUTO-ROLLBACK déclenché* sur ${GITHUB_REPOSITORY}@${GITHUB_SHA::7}\nRaison: santé critique post-déploiement\"}" \
+              "${{ secrets.SLACK_WEBHOOK_URL }}"
+          fi
+          exit 1   # marque le run comme failed pour visibilité
+
+  # ───────────────────────────────────────────────────────────────────
+  # Job 5 — Cron : surveille la prod toutes les 15 min
+  # ───────────────────────────────────────────────────────────────────
+  scheduled-monitoring:
+    name: ⏱️ Scheduled health probe
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Probe health
+        env:
+          MONITOR_API_URL: ${{ secrets.MONITOR_API_URL }}
+          MONITOR_API_KEY: ${{ secrets.MONITOR_API_KEY }}
+        run: |
+          curl -fsS -H "X-Monitor-Api-Key: $MONITOR_API_KEY" \
+            "$MONITOR_API_URL/api/monitor/health/" || {
+              echo "🚨 Health-check failed"
+              if [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
+                curl -X POST -H 'Content-Type: application/json' \
+                  --data '{"text": "🚨 Health-check planifié a échoué"}' \
+                  "${{ secrets.SLACK_WEBHOOK_URL }}"
+              fi
+              exit 1
+            }

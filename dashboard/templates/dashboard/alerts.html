@@ -1,0 +1,231 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Alertes & Releases — Student #5{% endblock %}
+{% block nav_alerts %}active{% endblock %}
+
+{% block content %}
+<div class="content-wrap" style="padding:32px;">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px;">
+    <div>
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">
+        Student #5 · Monitoring Online Partie 2 + Release
+      </div>
+      <h1 style="font-size:24px;font-weight:300;letter-spacing:-.02em;">
+        Alertes <span style="color:var(--muted);font-weight:300;">/</span>
+        <span style="color:var(--amber);">Releases</span>
+      </h1>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="loadData()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:8px 14px;border-radius:var(--r);cursor:pointer;letter-spacing:.05em;">
+        ↻ Rafraîchir
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI cards -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;">
+    <div class="kpi-card" id="kpi-critical">
+      <div class="kpi-label">Critical (24h)</div>
+      <div class="kpi-value" style="color:var(--red);">—</div>
+    </div>
+    <div class="kpi-card" id="kpi-warning">
+      <div class="kpi-label">Warning (24h)</div>
+      <div class="kpi-value" style="color:var(--amber);">—</div>
+    </div>
+    <div class="kpi-card" id="kpi-deploy">
+      <div class="kpi-label">Deploys (30j)</div>
+      <div class="kpi-value" style="color:var(--green);">—</div>
+    </div>
+    <div class="kpi-card" id="kpi-rollback">
+      <div class="kpi-label">Rollbacks (30j)</div>
+      <div class="kpi-value" style="color:var(--cyan);">—</div>
+    </div>
+  </div>
+
+  <!-- Two columns: alerts left, releases right -->
+  <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:18px;align-items:start;">
+
+    <!-- Alerts -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Flux d'alertes <span style="color:var(--muted);font-size:10px;font-weight:400;">— dernières 24h</span></div>
+        <div style="display:flex;gap:6px;">
+          <select id="filter-severity" onchange="loadData()" class="filter-select">
+            <option value="">Toutes sévérités</option>
+            <option value="critical">Critical</option>
+            <option value="warning">Warning</option>
+            <option value="info">Info</option>
+          </select>
+          <select id="filter-kind" onchange="loadData()" class="filter-select">
+            <option value="">Tous types</option>
+            <option value="error_rate">Erreurs</option>
+            <option value="latency">Latence</option>
+            <option value="drift">Drift</option>
+            <option value="release_gate">Release gate</option>
+            <option value="rollback">Rollback</option>
+          </select>
+        </div>
+      </div>
+      <div id="alerts-list" class="panel-body">
+        <div class="empty-state">Chargement…</div>
+      </div>
+    </div>
+
+    <!-- Releases -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Historique des releases <span style="color:var(--muted);font-size:10px;font-weight:400;">— 30 jours</span></div>
+      </div>
+      <div id="releases-list" class="panel-body">
+        <div class="empty-state">Chargement…</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+  .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;}
+  .kpi-label{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
+  .kpi-value{font-family:var(--mono);font-size:28px;font-weight:500;letter-spacing:-.02em;}
+
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+  .panel-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .panel-title{font-size:12px;font-weight:500;letter-spacing:.04em;}
+  .panel-body{max-height:680px;overflow-y:auto;}
+
+  .filter-select{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:10px;padding:5px 8px;border-radius:4px;}
+
+  .alert-row{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start;}
+  .alert-row:hover{background:rgba(255,255,255,.02);}
+  .alert-row:last-child{border-bottom:none;}
+  .alert-pill{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border-radius:3px;flex-shrink:0;font-weight:500;}
+  .alert-pill.critical{background:rgba(255,77,106,.15);color:var(--red);border:1px solid rgba(255,77,106,.3);}
+  .alert-pill.warning{background:rgba(255,179,64,.15);color:var(--amber);border:1px solid rgba(255,179,64,.3);}
+  .alert-pill.info{background:rgba(0,212,255,.15);color:var(--cyan);border:1px solid rgba(0,212,255,.3);}
+  .alert-content{flex:1;min-width:0;}
+  .alert-title{font-size:13px;font-weight:500;margin-bottom:3px;}
+  .alert-meta{font-family:var(--mono);font-size:10px;color:var(--muted);}
+  .alert-message{font-size:11px;color:var(--muted2);margin-top:6px;line-height:1.5;}
+
+  .release-row{padding:11px 18px;border-bottom:1px solid var(--border);}
+  .release-row:last-child{border-bottom:none;}
+  .release-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .release-event{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border-radius:3px;font-weight:500;}
+  .release-event.deploy{background:rgba(0,255,136,.12);color:var(--green);border:1px solid rgba(0,255,136,.3);}
+  .release-event.rollback{background:rgba(0,212,255,.12);color:var(--cyan);border:1px solid rgba(0,212,255,.3);}
+  .release-event.blocked{background:rgba(255,77,106,.12);color:var(--red);border:1px solid rgba(255,77,106,.3);}
+  .release-version{font-family:var(--mono);font-size:11px;}
+  .release-meta{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px;}
+  .release-reason{font-size:11px;color:var(--muted2);margin-top:5px;line-height:1.4;}
+
+  .empty-state{padding:40px 20px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:11px;}
+</style>
+
+<script>
+const API_KEY = '{{ api_key }}';
+
+async function fetchJSON(url){
+  const r = await fetch(url, {headers: {'X-Monitor-Api-Key': API_KEY}});
+  if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  return await r.json();
+}
+
+function fmtTime(iso){
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = (now - d) / 1000;
+  if(diff < 60)    return 'à l\'instant';
+  if(diff < 3600)  return `il y a ${Math.floor(diff/60)}min`;
+  if(diff < 86400) return `il y a ${Math.floor(diff/3600)}h`;
+  return d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+}
+
+function escapeHtml(s){
+  return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function loadAlerts(){
+  const sev  = document.getElementById('filter-severity').value;
+  const kind = document.getElementById('filter-kind').value;
+  let url = '/api/alerts/?hours=24';
+  if(sev)  url += `&severity=${sev}`;
+  if(kind) url += `&kind=${kind}`;
+
+  try {
+    const data = await fetchJSON(url);
+    const list = document.getElementById('alerts-list');
+
+    if(!data.alerts.length){
+      list.innerHTML = '<div class="empty-state">✅ Aucune alerte sur la période — système healthy.</div>';
+      return;
+    }
+
+    list.innerHTML = data.alerts.map(a => `
+      <div class="alert-row">
+        <span class="alert-pill ${a.severity}">${a.severity}</span>
+        <div class="alert-content">
+          <div class="alert-title">${escapeHtml(a.title)}</div>
+          <div class="alert-meta">${a.kind} · ${fmtTime(a.triggered_at)}${a.metric_value !== null ? ' · valeur=' + a.metric_value + ' / seuil=' + a.threshold : ''}${a.acknowledged ? ' · ✓ acquittée' : ''}</div>
+          <div class="alert-message">${escapeHtml(a.message)}</div>
+        </div>
+      </div>
+    `).join('');
+  } catch(e){
+    document.getElementById('alerts-list').innerHTML = `<div class="empty-state" style="color:var(--red)">❌ ${e.message}</div>`;
+  }
+}
+
+async function loadReleases(){
+  try {
+    const data = await fetchJSON('/api/alerts/releases/?days=30');
+    const list = document.getElementById('releases-list');
+
+    if(!data.releases.length){
+      list.innerHTML = '<div class="empty-state">Aucune release enregistrée.<br><span style="font-size:10px;">Lance: <code style="color:var(--cyan);">python manage.py release_gate</code></span></div>';
+      return;
+    }
+
+    list.innerHTML = data.releases.map(r => `
+      <div class="release-row">
+        <div class="release-head">
+          <span class="release-event ${r.event}">${r.event}</span>
+          <span class="release-version">v${escapeHtml(r.version || '?')}</span>
+          ${r.success ? '' : '<span style="color:var(--red);font-size:10px;font-family:var(--mono);">✗ failed</span>'}
+        </div>
+        <div class="release-meta">${fmtTime(r.occurred_at)} · par ${r.triggered_by}${r.offline_score !== null ? ' · score=' + r.offline_score : ''}${r.git_sha ? ' · ' + r.git_sha.substring(0,7) : ''}</div>
+        ${r.reason ? `<div class="release-reason">${escapeHtml(r.reason.split('\\n')[0])}</div>` : ''}
+      </div>
+    `).join('');
+
+    // Update KPIs
+    const deploys   = data.releases.filter(r => r.event === 'deploy' && r.success).length;
+    const rollbacks = data.releases.filter(r => r.event === 'rollback').length;
+    document.querySelector('#kpi-deploy   .kpi-value').textContent = deploys;
+    document.querySelector('#kpi-rollback .kpi-value').textContent = rollbacks;
+  } catch(e){
+    document.getElementById('releases-list').innerHTML = `<div class="empty-state" style="color:var(--red)">❌ ${e.message}</div>`;
+  }
+}
+
+async function loadKPIs(){
+  try {
+    const data = await fetchJSON('/api/alerts/?hours=24');
+    const crit = data.alerts.filter(a => a.severity === 'critical').length;
+    const warn = data.alerts.filter(a => a.severity === 'warning').length;
+    document.querySelector('#kpi-critical .kpi-value').textContent = crit;
+    document.querySelector('#kpi-warning  .kpi-value').textContent = warn;
+  } catch(e){ /* silent */ }
+}
+
+function loadData(){
+  loadAlerts();
+  loadReleases();
+  loadKPIs();
+}
+
+loadData();
+setInterval(loadData, 30000);   // refresh every 30s
+</script>
+{% endblock %}

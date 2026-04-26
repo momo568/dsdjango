@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'llm_monitor',  
     'dashboard',
+    'alerting',
 ]
 
 MIDDLEWARE = [
@@ -108,3 +109,11 @@ LLM_HEALTH_LATENCY_DEGRADED    = 3000
 LLM_HEALTH_LATENCY_CRITICAL    = 10000
 LLM_HEALTH_DRIFT_DEGRADED      = 1
 LLM_HEALTH_DRIFT_CRITICAL      = 5
+ALERTING_COOLDOWN_MINUTES = 10
+ROLLBACK_SCRIPT_PATH      = BASE_DIR / 'scripts' / 'rollback.sh'
+EMAIL_HOST          = 'smtp.gmail.com'
+EMAIL_PORT          = 587
+EMAIL_USE_TLS       = True
+EMAIL_HOST_USER     = 'bouguerrae63@gmail.com' 
+EMAIL_HOST_PASSWORD = 'mmkf uovt swnt gtke'            
+DEFAULT_FROM_EMAIL  = 'eya.bouguerra@sesame.com.tn'
