@@ -282,7 +282,12 @@ a{color:inherit;text-decoration:none}
       </svg>
       État Système
     </a>
-
+    <a href="{% url 'dashboard-alerts' %}" class="nav-link {% block nav_alerts %}{% endblock %}">
+  <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+    <path d="M8 1l7 13H1L8 1zM8 6v4M8 12v.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+  </svg>
+  Alertes & Releases
+</a>
     <div class="sb-section" style="margin-top:8px;">Pipeline d'Évaluation</div>
 
     <a href="{% url 'dashboard-comparaison' %}" class="nav-link {% block nav_comparaison %}{% endblock %}" style="color:#a78bfa;border-left-color:rgba(167,139,250,.3);"

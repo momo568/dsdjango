@@ -98,7 +98,7 @@ def api_summary(request):
     data['offline_bleu']     = offline.get('bleu_score', 0)
     data['offline_rouge']    = offline.get('rouge_score', 0)
     data['offline_judge']    = offline.get('llm_judge_score', 0)
-    data['offline_security'] = offline.get('security_score', 0)  # ← AJOUT
+    data['offline_security'] = offline.get('security_score', 0)
     data['offline_avg']      = offline.get('average_score', 0)
     
     # Rapport général
@@ -161,4 +161,11 @@ def comparaison_view(request):
         'v2': v2,
         'metriques': metriques,
         'solutions': solutions,
+    })
+
+
+def alerts_view(request):
+    """Page Alertes & Releases (Student #5)."""
+    return render(request, 'dashboard/alerts.html', {
+        'api_key': getattr(settings, 'LLM_MONITOR_API_KEY', 'dev-key'),
     })

@@ -9,4 +9,5 @@ urlpatterns = [
     path('health/',       views.health_view,       name='dashboard-health'),
     path('api/summary/',  views.api_summary,       name='api-summary'),
     path('comparaison/',  views.comparaison_view,  name='dashboard-comparaison'),
-]
+    path('alerts/', views.alerts_view, name='dashboard-alerts'),
+]
